@@ -1,0 +1,34 @@
+import { Canvas, Controls, Meta, Source, Subtitle, Title } from "@storybook/blocks";
+
+import * as TagStories from "./Tag.stories";
+
+<Meta of={TagStories} title="Docs/Tag" />
+
+<Title />
+<Subtitle>Status tags with solid, light, and outlined treatments across semantic kinds.</Subtitle>
+
+Tags are intended for short status labels and can optionally expose an action affordance.
+
+## Interactive Example
+
+<Canvas of={TagStories.Interactive} />
+
+## Developer Snippet
+
+<Source
+  code={`<Tag
+  kind="Positive"
+  variant="Light"
+  label="ACTIVE"
+  showAction
+/>`}
+  language="tsx"
+/>
+
+## Props
+
+<Controls of={TagStories.Playground} />
+
+## Variant Matrix
+
+<Canvas of={TagStories.Matrix} />

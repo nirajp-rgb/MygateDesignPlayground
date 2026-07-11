@@ -1,0 +1,37 @@
+import { Canvas, Meta, Source, Subtitle, Title } from "@storybook/blocks";
+
+import * as SelectionStories from "./SelectionControls.stories";
+
+<Meta of={SelectionStories} title="Docs/Selection Controls" />
+
+<Title />
+<Subtitle>Checkbox, radio, and switch controls with mapped click, pressed, focus, and disabled states.</Subtitle>
+
+These controls now include interactive stories so developers can inspect state changes directly instead of only looking at static matrices.
+
+## Checkbox
+
+<Canvas of={SelectionStories.CheckboxInteractive} />
+
+<Source
+  code={`<Checkbox
+  checked
+  label="Email me updates"
+  description="Optional supporting text"
+/>`}
+  language="tsx"
+/>
+
+## Radio
+
+<Canvas of={SelectionStories.RadioInteractive} />
+
+## Switch
+
+<Canvas of={SelectionStories.SwitchInteractive} />
+
+## Reference Matrices
+
+<Canvas of={SelectionStories.CheckboxMatrix} />
+<Canvas of={SelectionStories.RadioMatrix} />
+<Canvas of={SelectionStories.SwitchMatrix} />

@@ -1,0 +1,32 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.8.2
+2 info using node@v20.17.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/niraj/.npmrc
+5 error config prefix cannot be changed from project config: /Users/niraj/.npmrc.
+6 silly config load:file:/Users/niraj/Documents/GitHub/MygateDesignPlayground/mobile/storybook/.npmrc
+7 silly config load:file:/Users/niraj/Documents/GitHub/MygateDesignPlayground/mobile/storybook/.npm-global/etc/npmrc
+8 verbose title npm run build-storybook
+9 verbose argv "run" "build-storybook"
+10 verbose logfile logs-max:10 dir:/Users/niraj/Documents/GitHub/MygateDesignPlayground/mobile/storybook/.npm/_logs/2026-04-23T09_17_53_250Z-
+11 verbose logfile /Users/niraj/Documents/GitHub/MygateDesignPlayground/mobile/storybook/.npm/_logs/2026-04-23T09_17_53_250Z-debug-0.log
+12 silly logfile done cleaning log files
+13 verbose stack Error: Missing script: "build-storybook"
+13 verbose stack
+13 verbose stack To see a list of scripts, run:
+13 verbose stack   npm run
+13 verbose stack     at #run (/usr/local/lib/node_modules/npm/lib/commands/run-script.js:110:13)
+13 verbose stack     at async RunScript.exec (/usr/local/lib/node_modules/npm/lib/commands/run-script.js:39:7)
+13 verbose stack     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:207:9)
+13 verbose stack     at async module.exports (/usr/local/lib/node_modules/npm/lib/cli/entry.js:74:5)
+14 error Missing script: "build-storybook"
+14 error
+14 error To see a list of scripts, run:
+14 error   npm run
+15 verbose cwd /Users/niraj/Documents/GitHub/WriteBot
+16 verbose os Darwin 24.0.0
+17 verbose node v20.17.0
+18 verbose npm  v10.8.2
+19 verbose exit 1
+20 verbose code 1
+21 error A complete log of this run can be found in: /Users/niraj/Documents/GitHub/MygateDesignPlayground/mobile/storybook/.npm/_logs/2026-04-23T09_17_53_250Z-debug-0.log
