@@ -6,6 +6,6 @@ export type { ListItemArtwork, ListItemLayout, ListItemProps, ListItemSize } fro
 export { NumberBadge } from './NumberBadge';
 export { Tag } from './Tag';
 export { Tile } from './Tile';
-export type { TileArtworkType, TileProps, TileSize } from './Tile';
+export type { TileArtworkType, TileProps, TileSize, TileVariant } from './Tile';
 export { TileGroup } from './TileGroup';
 export type { TileGroupItem, TileGroupProps } from './TileGroup';

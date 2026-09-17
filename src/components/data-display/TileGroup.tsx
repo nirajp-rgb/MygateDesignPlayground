@@ -8,16 +8,38 @@ export type TileGroupProps = { items: readonly TileGroupItem[]; value: string | 
 
 export function TileGroup({ items, value, onChange, selectionMode = 'single', columns = 2 }: TileGroupProps) {
   const selectedValues = Array.isArray(value) ? value : value ? [value] : [];
+  const safeColumns = Math.max(1, Math.floor(columns));
+  const rows: TileGroupItem[][] = [];
+
+  for (let index = 0; index < items.length; index += safeColumns) {
+    rows.push(items.slice(index, index + safeColumns));
+  }
+
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
-      {items.map(({ key, ...item }) => {
-        const selected = selectedValues.includes(key);
-        return (
-          <View key={key} style={{ width: `${100 / columns - 2}%` }}>
-            <Tile {...item} selected={selected} onPress={() => selectionMode === 'multiple' ? onChange(selected ? selectedValues.filter((entry) => entry !== key) : [...selectedValues, key]) : onChange(selected ? null : key)} />
-          </View>
-        );
-      })}
+    <View style={{ gap: spacing.md }}>
+      {rows.map((row, rowIndex) => (
+        <View key={`row-${rowIndex}`} style={{ flexDirection: 'row', gap: spacing.md }}>
+          {row.map(({ key, ...item }) => {
+            const selected = selectedValues.includes(key);
+            return (
+              <View key={key} style={{ flex: 1, minWidth: 0 }}>
+                <Tile
+                  {...item}
+                  selected={selected}
+                  onPress={() => selectionMode === 'multiple'
+                    ? onChange(selected ? selectedValues.filter((entry) => entry !== key) : [...selectedValues, key])
+                    : onChange(selected ? null : key)}
+                />
+              </View>
+            );
+          })}
+          {row.length < safeColumns
+            ? Array.from({ length: safeColumns - row.length }, (_, index) => (
+                <View key={`spacer-${index}`} style={{ flex: 1, minWidth: 0 }} />
+              ))
+            : null}
+        </View>
+      ))}
     </View>
   );
 }

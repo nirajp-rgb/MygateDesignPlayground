@@ -14,7 +14,7 @@ const config: StorybookConfig = {
       ...(config.resolve.alias ?? {}),
       'react-native': path.resolve(process.cwd(), 'node_modules/react-native-web'),
       'react-native-safe-area-context': path.resolve(process.cwd(), '.storybook/safe-area-context.tsx'),
-      'react-native-svg': path.resolve(process.cwd(), 'node_modules/react-native-svg/lib/module/ReactNativeSVG.web.js'),
+      'react-native-svg': path.resolve(process.cwd(), 'node_modules/react-native-svg/lib/module/elements.web.js'),
     };
     config.define = { ...(config.define ?? {}), 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'development') };
     return config;

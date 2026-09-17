@@ -8,34 +8,6 @@ export type ChipType = 'Assist' | 'Filter' | 'Input';
 export type ChipTone = 'Neutral' | 'Info' | 'Positive' | 'Warning' | 'Negative';
 export type ChipState = 'Default' | 'Selected' | 'Pressed' | 'Disabled';
 
-const toneMap = {
-  Neutral: {
-    bg: colors.surfacePrimary,
-    border: colors.borderDefault,
-    text: colors.contentPrimary
-  },
-  Info: {
-    bg: colors.surfaceInfoSubtle,
-    border: colors.borderInfo,
-    text: colors.contentInfo
-  },
-  Positive: {
-    bg: colors.surfacePositiveSubtle,
-    border: colors.borderPositive,
-    text: colors.contentPositive
-  },
-  Warning: {
-    bg: colors.surfaceWarningSubtle,
-    border: colors.borderWarning,
-    text: colors.contentWarning
-  },
-  Negative: {
-    bg: colors.surfaceNegativeSubtle,
-    border: colors.borderNegative,
-    text: colors.contentNegative
-  }
-} as const;
-
 type ChipIcon = ComponentType<IconProps>;
 
 export type ChipProps = {
@@ -65,6 +37,34 @@ export function Chip({
   selected,
   disabled,
 }: ChipProps) {
+  const toneMap = {
+    Neutral: {
+      bg: colors.surfacePrimary,
+      border: colors.borderDefault,
+      text: colors.contentPrimary
+    },
+    Info: {
+      bg: colors.surfaceInfoSubtle,
+      border: colors.borderInfo,
+      text: colors.contentInfo
+    },
+    Positive: {
+      bg: colors.surfacePositiveSubtle,
+      border: colors.borderPositive,
+      text: colors.contentPositive
+    },
+    Warning: {
+      bg: colors.surfaceWarningSubtle,
+      border: colors.borderWarning,
+      text: colors.contentWarning
+    },
+    Negative: {
+      bg: colors.surfaceNegativeSubtle,
+      border: colors.borderNegative,
+      text: colors.contentNegative
+    }
+  } as const;
+
   const isDisabled = disabled ?? state === 'Disabled';
   const isSelected = selected ?? state === 'Selected';
   const isPressed = state === 'Pressed';
@@ -98,6 +98,7 @@ export function Chip({
         minWidth: 80,
         flexDirection: 'row',
         alignItems: 'center',
+        alignSelf: 'flex-start',
         justifyContent: 'center',
         gap: spacing.xs,
         borderRadius: radius.pill,
@@ -111,7 +112,7 @@ export function Chip({
       {showLeadingIcon && LeadingIcon
         ? <LeadingIcon size={iconSize.sm} color={textColor} weight="regular" />
         : null}
-      <Text style={[typography.bodySmallBold, { color: textColor }]}>{label}</Text>
+      <Text style={[typography.bodyDefault, { color: textColor }]}>{label}</Text>
       {showTrailingIcon && TrailingIcon
         ? <TrailingIcon size={iconSize.sm} color={textColor} weight="regular" />
         : null}

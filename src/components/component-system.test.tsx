@@ -62,10 +62,12 @@ describe('component system interactions', () => {
     const items = [
       { key: 'home', label: 'Home', artworkType: 'icon' as const, icon: House },
       { key: 'profile', label: 'Profile', artworkType: 'icon' as const, icon: User },
+      { key: 'alerts', label: 'Alerts', artworkType: 'icon' as const, icon: Bell },
     ];
     const view = render(<TileGroup items={items} value="home" onChange={onChange} />);
     fireEvent.press(view.getByText('Profile'));
     expect(onChange).toHaveBeenCalledWith('profile');
+    expect(view.getByText('Alerts')).toBeTruthy();
     expect(view.getAllByRole('button')[0].props.accessibilityState.selected).toBe(true);
   });
 

@@ -547,6 +547,8 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showFlatSwitcher, setShowFlatSwitcher] = useState(false);
   const [isInSecondFold, setIsInSecondFold] = useState(false);
+  const [isChipGroupSticky, setIsChipGroupSticky] = useState(false);
+  const [chipGroupOffset, setChipGroupOffset] = useState(0);
   const [preFeedSectionHeight, setPreFeedSectionHeight] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -627,6 +629,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
 
     // Update header background color based on scroll position
     setIsInSecondFold(currentY >= firstFoldHeight);
+    setIsChipGroupSticky(chipGroupOffset > 0 && currentY >= chipGroupOffset);
 
     // Prevent snapping if already snapping
     if (isSnapping.current || firstFoldHeight <= 0) return;
@@ -967,7 +970,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surfacePage }}>
+    <View style={{ flex: 1, backgroundColor: colors.surfacePageStrong }}>
 
       {/* Header */}
       <AppHeader
@@ -977,7 +980,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
         showShadow = {isInSecondFold}
         borderColor={colors.borderSubtle}
         leftSlot={
-          <Button kind="Link" size="MD" label="B 102" showRightIcon rightIcon={CaretDown} onPress={openFlatSwitcher} />
+          <Button kind="Link" size="LG" label="B 102" showRightIcon rightIcon={CaretDown} onPress={openFlatSwitcher} />
         }
         rightSlot={
           <>
@@ -1054,7 +1057,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
             <Text style={typography.bodyLargeBold}>3 Updates</Text>
           </View>
 
-          <SurfaceCard elevated={false} >
+          <SurfaceCard elevated={false} borderWidth={0}  >
             <SectionHeader
               title="Visitor Updates"
               actionLabel="View All"
@@ -1068,7 +1071,8 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
           </SurfaceCard>
 
           <Banner
-            elevated={false}
+            elevated={false} 
+            
             icon={Buildings}
             iconColor={colors.contentSecondary}
             title="Your society due is overdue"
@@ -1085,7 +1089,13 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
           <CreatePostCard />
         </View>
 
-        <View style={{ backgroundColor: colors.surfacePage, paddingVertical: spacing.md }}>
+        <View
+          onLayout={event => setChipGroupOffset(event.nativeEvent.layout.y)}
+          style={{
+            backgroundColor: isChipGroupSticky ? colors.surfacePage : 'transparent',
+            paddingVertical: spacing.md,
+          }}
+        >
           <View style={{ paddingHorizontal: spacing.md }}>
             <ChipGroup layout="horizontal" value={activeTab} options={feedTabItems.map((tab) => ({ key: tab.key, label: `${tab.label} (${tab.count})` }))} onChange={(next) => { setActiveTab(typeof next === 'string' ? next as FeedTabKey : null); scrollToFeedTop(); }} />
           </View>

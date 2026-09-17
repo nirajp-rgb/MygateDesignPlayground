@@ -1,0 +1,37 @@
+@font-face {
+  font-family: "Archivo_400Regular";
+  src: url("../node_modules/@expo-google-fonts/archivo/400Regular/Archivo_400Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Archivo_600SemiBold";
+  src: url("../node_modules/@expo-google-fonts/archivo/600SemiBold/Archivo_600SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body,
+#storybook-root,
+#storybook-docs {
+  min-height: 100%;
+}
+
+body {
+  font-family: "Archivo_400Regular", Arial, sans-serif;
+}
+
+.docs-story,
+.sbdocs,
+.sbdocs-wrapper,
+.sbdocs-content {
+  font-family: "Archivo_400Regular", Arial, sans-serif;
+}
+
+.sbdocs-content {
+  max-width: none;
+}
