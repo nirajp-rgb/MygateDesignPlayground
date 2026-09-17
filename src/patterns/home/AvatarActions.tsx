@@ -8,5 +8,5 @@ export function HomeProfileButton({ onPress }: { onPress: () => void }) {
 }
 
 export function VisitorAvatarButton({ name, source, onPress }: { name: string; source: ImageSourcePropType; onPress?: () => void }) {
-  return <Pressable accessibilityRole={onPress ? 'button' : undefined} accessibilityLabel={onPress ? `Open ${name}` : name} disabled={!onPress} onPress={onPress} style={({ pressed }) => ({ width: '22%', alignItems: 'center', gap: spacing.xs, opacity: pressed ? 0.85 : 1 })}><Avatar status="Online" size="XL" type="Image" source={source} /><Text numberOfLines={1} style={[typography.bodySmall, { color: colors.contentSecondary, textAlign: 'center' }]}>{name}</Text></Pressable>;
+  return <Pressable accessibilityRole={onPress ? 'button' : undefined} accessibilityLabel={onPress ? `Open ${name}` : name} disabled={!onPress} onPress={onPress} style={({ pressed }) => ({ width: '20%', alignItems: 'center', gap: spacing.xs, opacity: pressed ? 0.85 : 1 })}><Avatar status="Online" size="XL" type="Image" source={source} /><Text numberOfLines={1} style={[typography.bodySmall, { color: colors.contentSecondary, textAlign: 'center' }]}>{name}</Text></Pressable>;
 }

@@ -40,7 +40,7 @@ export function Banner({ icon: Icon, iconColor, title, description, tone = 'neut
     </>
   );
   return (
-    <SurfaceCard elevated={elevated}>
+    <SurfaceCard elevated={elevated} borderWidth={0}>
       {onPress ? <Pressable accessibilityRole="button" onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>{content}</Pressable> : <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>{content}</View>}
     </SurfaceCard>
   );

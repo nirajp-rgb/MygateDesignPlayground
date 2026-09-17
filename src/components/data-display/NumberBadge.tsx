@@ -17,6 +17,7 @@ export function NumberBadge({ count }: NumberBadgeProps) {
         borderColor:colors.surfacePrimary,
         backgroundColor: colors.contentNegative,
         alignItems: 'center',
+        alignSelf: 'flex-start',
         justifyContent: 'center',
         
       }}

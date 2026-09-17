@@ -96,9 +96,10 @@ export function Tag({
       onPress={onPress}
       style={({ pressed }) => ({
         
-        minWidth: 40,
+        // minWidth: 40,
         flexDirection: 'row',
         alignItems: 'center',
+        alignSelf: 'flex-start',
         justifyContent: 'center',
         gap: spacing.xs,
         borderRadius: radius.sm,

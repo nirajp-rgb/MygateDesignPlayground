@@ -124,16 +124,16 @@ export function QuickActionsScreen({ onNavigate, onClose }: Props) {
       {/* Sections */}
       <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: spacing.md }}>
         {sections.map((section, idx) => (
-          <View key={idx} style={{ marginBottom: spacing.lg }}>
+          <View key={idx} style={{ marginBottom: spacing.lg , gap: spacing.md}}>
             {/* Section Header */}
             <SectionHeader
               title={section.title}
               rightSlot={
-                section.actionLabel ? <Button kind={section.actionLabel === 'Raise Alert' ? 'Tertiary' : 'Link'} size="SM" label={section.actionLabel} /> : null}
+                section.actionLabel ? <Button kind={section.actionLabel === 'Raise Alert' ? 'Tertiary' : 'Link'} size={section.actionLabel === 'Raise Alert' ? 'SM' : 'MD'} label={section.actionLabel} /> : null}
             />
 
             {/* Tiles Grid */}
-            <TileGrid items={section.items} columns={4} gap={spacing.xs} />
+            <TileGrid items={section.items} columns={4} gap={spacing.sm} />
           </View>
         ))}
 
