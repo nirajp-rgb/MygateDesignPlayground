@@ -1,14 +1,13 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, View } from 'react-native';
 import {
-  X, MagnifyingGlass, Phone, EnvelopeOpen, Lock, Users, MapPin, BookOpen,
-  User, FileText, Car, Briefcase, Key, Lightbulb, Heart, Gear,
+  X, Phone, EnvelopeOpen, Lock, Users, MapPin, BookOpen,
+  User, FileText, Car, Briefcase, Lightbulb,
   Bell, House, Tag, Question,
   CalendarStarIcon,
 } from 'phosphor-react-native';
-import { TileGrid } from '../components/TileGrid';
-import type { TileGridItem } from '../components/TileGrid';
-import { appHeaderHeight, appPagePaddingBottom, colors, iconSize, radius, spacing, typography } from '../tokens';
+import { AppHeader, Button, IconButton, SearchField, SectionHeader, TileGrid } from '../components';
+import type { TileGridItem } from '../components';
+import { appPagePaddingBottom, colors, spacing } from '../tokens';
 import type { PrototypeScreenKey } from './types';
 
 type Props = {
@@ -100,58 +99,26 @@ const sections = [
   },
 ];
 
-// Simple Calendar icon since phosphor might not have it
-function Calendar(props: any) {
-  return (
-    <View
-      style={{
-        width: props.size || 24,
-        height: props.size || 24,
-        borderWidth: 2,
-        borderColor: props.color || colors.contentSecondary,
-        borderRadius: 4,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <View style={{ width: '80%', height: 2, backgroundColor: props.color || colors.contentSecondary }} />
-    </View>
-  );
-}
-
 export function QuickActionsScreen({ onNavigate, onClose }: Props) {
-  const insets = useSafeAreaInsets();
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.surfacePage, paddingBottom: appPagePaddingBottom }}>
       {/* Header */}
-      <View style={{ paddingTop: insets.top, backgroundColor: colors.surfacePage }}>
-        <View style={{ minHeight: appHeaderHeight, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={typography.titleSubsection}>Quick Actions</Text>
-          <Pressable onPress={onClose}>
-            <X size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-          </Pressable>
-        </View>
-      </View>
+      <AppHeader
+        title="Quick Actions"
+        variant="transparent"
+        titleAlign="left"
+        rightSlot={
+          <IconButton type="Ghost" size="MD" icon={X} accessibilityLabel="Close quick actions" onPress={onClose} />
+        }
+      />
 
       {/* Search Bar */}
       <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.md }}>
-        <Pressable
+        <SearchField
+          mode="trigger"
+          placeholder="Search all features"
           onPress={() => onNavigate('searchExperience')}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: colors.surfaceSecondary,
-            borderRadius: radius.lg,
-            borderWidth: 1,
-            borderColor: colors.borderDefault,
-            paddingHorizontal: spacing.sm,
-            paddingVertical: spacing.md
-          }}
-        >
-          <MagnifyingGlass size={iconSize.md} color={colors.contentTertiary} weight="regular" />
-          <Text style={[typography.bodyDefault, { flex: 1, marginLeft: spacing.xs, color: colors.contentTertiary }]}>Search all features</Text>
-        </Pressable>
+        />
       </View>
 
       {/* Sections */}
@@ -159,30 +126,11 @@ export function QuickActionsScreen({ onNavigate, onClose }: Props) {
         {sections.map((section, idx) => (
           <View key={idx} style={{ marginBottom: spacing.lg }}>
             {/* Section Header */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md , marginHorizontal:spacing.md}}>
-              <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary }]}>{section.title}</Text>
-              {section.actionLabel && section.actionLabel === 'Raise Alert' ? (
-                <Pressable
-                  style={{
-                    paddingHorizontal: spacing.md,
-                    paddingVertical: spacing.xs,
-                    borderRadius: radius.pill,
-                    borderWidth: 1,
-                    borderColor: colors.contentNegative,
-                  }}
-                >
-                  <Text style={[typography.bodySmallBold, { color: colors.contentNegative }]}>
-                    {section.actionLabel}
-                  </Text>
-                </Pressable>
-              ) : section.actionLabel ? (
-                <Pressable>
-                  <Text style={[typography.bodySmallBold, { color: section.actionColor }]}>
-                    {section.actionLabel}
-                  </Text>
-                </Pressable>
-              ) : null}
-            </View>
+            <SectionHeader
+              title={section.title}
+              rightSlot={
+                section.actionLabel ? <Button kind={section.actionLabel === 'Raise Alert' ? 'Tertiary' : 'Link'} size="SM" label={section.actionLabel} /> : null}
+            />
 
             {/* Tiles Grid */}
             <TileGrid items={section.items} columns={4} gap={spacing.xs} />

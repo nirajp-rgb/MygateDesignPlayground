@@ -34,6 +34,9 @@ export function createUI(mode: Mode = 'light') {
   colors.feedbackNegative = colors.contentNegative;
   colors.feedbackWarning = colors.contentWarning;
   colors.feedbackInfo = colors.contentInfo;
+  colors.overlayStrong = 'rgba(17, 24, 39, 0.72)';
+  colors.overlayBackdrop = 'rgba(2, 6, 23, 0.48)';
+  colors.overlayLight = 'rgba(255, 255, 255, 0.12)';
 
   const spacing = {
     xs: dimension['Dimension/spacing/100'],
@@ -79,6 +82,8 @@ export function createUI(mode: Mode = 'light') {
     bodySmallBold: TextStyle;
     caption: TextStyle;
     captionBold: TextStyle;
+    badge: TextStyle;
+    badgeSmall: TextStyle;
   };
 
   const typography: TypographyAliases = {
@@ -97,7 +102,9 @@ export function createUI(mode: Mode = 'light') {
     bodySmall: theme.typography['body-sm'],
     bodySmallBold: theme.typography['body-sm-bold'],
     caption: theme.typography['body-sm'],
-    captionBold: theme.typography['body-sm-bold']
+    captionBold: theme.typography['body-sm-bold'],
+    badge: { ...theme.typography['body-sm-bold'], fontSize: 12, lineHeight: 12 },
+    badgeSmall: { ...theme.typography['body-sm-bold'], fontSize: 8, lineHeight: 10 }
   } as TypographyAliases;
 
   return {

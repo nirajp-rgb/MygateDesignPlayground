@@ -12,9 +12,15 @@
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx,.js,.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build -o storybook-static",
+    "components:check": "node ./scripts/check-component-system.mjs",
+    "validate": "npm run typecheck && npm run lint && npm run tokens:validate && npm run test && npm run components:check && npm run storybook:build",
     "tokens:validate": "node ./scripts/validate-token-usage.mjs",
     "tokens:export:figma-import": "node ./scripts/export-figma-import-safe-tokens.mjs",
-    "tokens:export:figma-bound": "node ./scripts/export-figma-bound-tokens.mjs"
+    "tokens:export:figma-bound": "node ./scripts/export-figma-bound-tokens.mjs",
+    "tokens:export:markdown": "node ./scripts/export-color-token-markdown.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/archivo": "^0.4.2",
@@ -35,11 +41,21 @@
   },
   "devDependencies": {
     "@expo/ngrok": "^4.1.3",
+    "@storybook/addon-essentials": "^8.6.18",
+    "@storybook/addon-interactions": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
+    "@storybook/test": "^8.6.18",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^8.58.1",
     "@typescript-eslint/parser": "^8.58.1",
     "babel-preset-expo": "~54.0.6",
     "eslint": "^9.39.4",
-    "typescript": "~5.9.2"
+    "jest-expo": "~54.0.17",
+    "react-test-renderer": "^19.1.0",
+    "storybook": "^8.6.18",
+    "typescript": "~5.9.2",
+    "vite": "^6.0.1"
   }
 }

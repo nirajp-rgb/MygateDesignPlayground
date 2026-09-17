@@ -16,7 +16,6 @@ import {
   SurfaceCard,
   Switch,
   Tag,
-  TemplateButton,
   Tile,
   TileGrid,
 } from '../components';
@@ -24,7 +23,7 @@ import type { TileGridItem } from '../components';
 import { ArrowRight, Palette, RocketLaunch } from '../icons';
 import type { PrototypeScreenKey } from './types';
 import { colors,iconSize, spacing, typography } from '../tokens';
-import { Bell, House, PlusIcon, User, XCircle, XIcon } from 'phosphor-react-native';
+import { Bell, House, PlusIcon, User, XIcon } from 'phosphor-react-native';
 
 type TemplateScreenProps = {
   activeScreen: PrototypeScreenKey;
@@ -516,22 +515,6 @@ export function TemplateScreen({ activeScreen, onNavigate }: TemplateScreenProps
             <ReviewCard rating={3.5} reviewText="Generally good but sometimes a bit late." date="10 Jan 2024" width={220} />
           </View>
         </ScrollView>
-      </SurfaceCard>
-
-      {/* ── TemplateButton ────────────────────────────────────── */}
-      <SurfaceCard>
-        <SectionHeader
-          title="TemplateButton"
-          subtitle="Pill-shaped prototype button — primary and secondary emphasis."
-        />
-        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-          <View style={{ flex: 1 }}>
-            <TemplateButton label="Primary" onPress={() => {}} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <TemplateButton label="Secondary" emphasis="secondary" onPress={() => onNavigate('home')} />
-          </View>
-        </View>
       </SurfaceCard>
 
     </ScreenFrame>

@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { ScreenFrame, SectionHeader, SurfaceCard, TemplateButton } from '../components';
+import { Button, ScreenFrame, SectionHeader, SurfaceCard } from '../components';
 import { ArrowRight, Palette, RocketLaunch, Shapes } from '../icons';
 import type { PrototypeScreenKey } from './types';
 import { colors, iconSize, radius, spacing, typography } from '../tokens';
@@ -44,7 +44,7 @@ export function HomeScreen({ activeScreen, onNavigate }: HomeScreenProps) {
         <Text style={[typography.bodyDefault, { color: colors.contentOnDark }]}>
           Start from HomeScreen, clone TemplateScreen when you need a second flow, and promote repeated layout patterns into shared components.
         </Text>
-        <TemplateButton label="Open the template screen" onPress={() => onNavigate('template')} />
+        <Button label="Open the template screen" onPress={() => onNavigate('template')} />
       </SurfaceCard>
 
       <SurfaceCard>
@@ -94,7 +94,7 @@ export function HomeScreen({ activeScreen, onNavigate }: HomeScreenProps) {
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <TemplateButton label="Stay on this starter" emphasis="secondary" />
+            <Button label="Stay on this starter" kind="Secondary" />
             <ArrowRight size={iconSize.md} color={colors.contentAction} weight="bold" />
           </View>
         </View>

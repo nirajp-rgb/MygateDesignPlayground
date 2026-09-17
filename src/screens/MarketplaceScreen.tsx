@@ -1,58 +1,45 @@
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import type { ImageSourcePropType } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import {
-  AlignRightIcon,
   Armchair,
-  Baby,
   BabyCarriageIcon,
   BookmarkSimple,
   BuildingIcon,
   Car,
-  CaretRight,
   ChalkboardTeacherIcon,
   ChatCircleDots,
-  ClockCounterClockwiseIcon,
   CookingPotIcon,
   DeviceMobile,
   DotsThree,
-  ForkKnife,
   IconProps,
-  JarIcon,
   LampIcon,
-  ListBullets,
-  MagnifyingGlass,
-  PaintBrushHousehold,
-  PlantIcon,
   Plus,
-  PlusIcon,
-  PlusSquareIcon,
   Receipt,
-  Users,
-  WheelchairIcon,
-  Wrench,
 } from 'phosphor-react-native';
-import { AppBottomNav } from '../components/AppBottomNav';
-import { AppHeader } from '../components/AppHeader';
-import { CategoryStatTile } from '../components/CategoryStatTile';
-import { IconButton } from '../components/IconButton';
-import { ListingCard } from '../components/ListingCard';
-import { SurfaceCard } from '../components/SurfaceCard';
-import { colors, iconSize, radius, spacing, typography } from '../tokens';
+import {
+  AppBottomNav,
+  AppHeader,
+  CategoryStatTile,
+  IconButton,
+  ListingCard,
+  SearchField,
+  SectionHeader,
+} from '../components';
+import { colors, iconSize, primitiveColors, radius, spacing, typography } from '../tokens';
 import { mainNavItems } from './mainNav';
 import type { PrototypeScreenKey } from './types';
-
-const promoBanner = require('../assets/MarketplaceITems/IMG_7002.webp');
-const carBlue = require('../assets/MarketplaceITems/126660A4-6E8E-4024-AA49-9D1141CC2244.png');
-const carBlack = require('../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png');
-const carSilver = require('../assets/MarketplaceITems/612BD327-6CFE-4C7A-8C70-6357C2B93642.png');
-const carRed = require('../assets/MarketplaceITems/66C752BA-178A-420D-92DD-3402751510DB.png');
-const furnitureLiving = require('../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png');
-const furnitureDining = require('../assets/MarketplaceITems/710E6CBE-05E3-4723-BBD3-45375C382EEE.png');
-const furnitureCoffee = require('../assets/MarketplaceITems/A2175418-39BA-4A4A-830F-390723EF957B.png');
-const furnitureRustic = require('../assets/MarketplaceITems/B4CCBC7A-B693-41F9-A2D2-1B6D70C58B70.png');
-const searchPropertyTileImage = require('../assets/MarketplaceITems/SearchProperty.png');
-const listPropertyTileImage = require('../assets/MarketplaceITems/ListPropertty.png');
+import promoBanner from '../assets/MarketplaceITems/IMG_7002.webp';
+import carBlue from '../assets/MarketplaceITems/126660A4-6E8E-4024-AA49-9D1141CC2244.png';
+import carBlack from '../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png';
+import carSilver from '../assets/MarketplaceITems/612BD327-6CFE-4C7A-8C70-6357C2B93642.png';
+import carRed from '../assets/MarketplaceITems/66C752BA-178A-420D-92DD-3402751510DB.png';
+import furnitureLiving from '../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png';
+import furnitureDining from '../assets/MarketplaceITems/710E6CBE-05E3-4723-BBD3-45375C382EEE.png';
+import furnitureCoffee from '../assets/MarketplaceITems/A2175418-39BA-4A4A-830F-390723EF957B.png';
+import furnitureRustic from '../assets/MarketplaceITems/B4CCBC7A-B693-41F9-A2D2-1B6D70C58B70.png';
+import searchPropertyTileImage from '../assets/MarketplaceITems/SearchProperty.png';
+import listPropertyTileImage from '../assets/MarketplaceITems/ListPropertty.png';
+import { MarketplacePromoCard, PropertyActionCard } from '../patterns/marketplace';
 
 const categories: Array<{ icon: React.ComponentType<IconProps>; label: string; stat: string }> = [
   { icon: Armchair, label: 'Furniture', stat: '82K+' },
@@ -83,55 +70,26 @@ const summerFindings = [
   {
     title: 'Beat the Heat',
     imageSource: furnitureDining,
-    backgroundColor: '#2AA7FF',
+    backgroundColor: primitiveColors['Color/brand/core/clear-blue/400'],
+    textColor: colors.contentOnDark
   },
   {
     title: 'Mango Mania',
     imageSource: furnitureCoffee,
-    backgroundColor: '#F4BE2C',
+    backgroundColor: colors.surfaceActionPrimary,
+    textColor: colors.contentPrimary
   },
   {
     title: 'Kids Classes',
     imageSource: furnitureRustic,
-    backgroundColor: '#54B5EB',
-  },
+    backgroundColor: primitiveColors['Color/support/purple/400'],
+    textColor: colors.contentOnDark
+  }
 ];
 
 type Props = {
   onNavigate: (screen: PrototypeScreenKey) => void;
 };
-
-function SectionRow({
-  icon: IconComponent,
-  title,
-  subtitle,
-  actionLabel = 'See all',
-}: {
-  icon: React.ComponentType<IconProps>;
-  title: string;
-  subtitle?: string;
-  actionLabel?: string;
-}) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 }}>
-        <View style={{ marginTop: 2 }}>
-          <IconComponent size={iconSize.xl} color={colors.contentPrimary} weight="light" />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={typography.bodyLargeBold}>{title}</Text>
-          {subtitle ? (
-            <Text style={[typography.caption, { color: colors.contentSecondary }]}>{subtitle}</Text>
-          ) : null}
-        </View>
-      </View>
-      <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-  <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>{actionLabel}</Text>
-  <CaretRight size={iconSize.sm} color={colors.contentAction} weight="bold" />
-</Pressable>
-    </View>
-  );
-}
 
 export function MarketplaceScreen({ onNavigate }: Props) {
   const [heroHeight, setHeroHeight] = useState(0);
@@ -173,28 +131,7 @@ export function MarketplaceScreen({ onNavigate }: Props) {
           }}
         >
           <View style={{ paddingHorizontal: spacing.md, gap: spacing.md }}>
-                <Pressable
-                  onPress={() => onNavigate('searchExperience')}
-                  style={{
-                    borderRadius: radius.xl,
-                    borderWidth: 1,
-                    borderColor: colors.borderDefault,
-                    backgroundColor: colors.surfacePrimary,
-                    paddingHorizontal: spacing.md,
-                    paddingVertical: spacing.md,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: spacing.sm,
-                    shadowColor: '#000000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.04,
-                    shadowRadius: 2,
-                    elevation: 2,
-                  }}
-                >
-                  <MagnifyingGlass size={iconSize.md} color={colors.contentTertiary} weight="regular" />
-                  <Text style={[typography.bodyDefault, { color: colors.contentTertiary }]}>What are you looking for?</Text>
-                </Pressable>
+                <SearchField mode="trigger" placeholder="What are you looking for?" onPress={() => onNavigate('searchExperience')} />
 
             <View style={{ gap: spacing.sm }}>
               {[0, 1].map((row) => (
@@ -207,42 +144,8 @@ export function MarketplaceScreen({ onNavigate }: Props) {
             </View>
 
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-              <SurfaceCard  borderWidth={0} style={{ flex: 1, gap: spacing.xs,paddingTop:spacing.md,paddingBottom:48,paddingHorizontal:spacing.md, overflow: 'hidden' }}>
-                <Text style={typography.bodyDefaultBold}>Search property</Text>
-                <Text style={[typography.caption, { color: colors.contentSecondary }]}>Buy or rent effortlessly</Text>
-                <View
-                  style={{
-                    position: 'absolute',
-                    right: -spacing.sm,
-                    bottom: -spacing.sm,
-                  }}
-                >
-                  <Image
-                    source={searchPropertyTileImage}
-                    resizeMode="contain"
-                    style={{ width: 80, height: 70 }}
-                  />
-                </View>
-              </SurfaceCard>
-              <Pressable style={{ flex: 1 }} onPress={() => onNavigate('listingWizard')}>
-                <SurfaceCard borderWidth={0} style={{ gap: spacing.xs, paddingTop: spacing.md, paddingBottom: 48, paddingHorizontal: spacing.md, overflow: 'hidden' }}>
-                  <View
-                    style={{
-                      position: 'absolute',
-                      right: -spacing.sm,
-                      bottom: -spacing.sm,
-                    }}
-                  >
-                    <Image
-                      source={listPropertyTileImage}
-                      resizeMode="contain"
-                      style={{ width: 80, height: 80 }}
-                    />
-                  </View>
-                  <Text style={typography.bodyDefaultBold}>List Property</Text>
-                  <Text style={[typography.caption, { color: colors.contentSecondary }]}>Verified buyers & 5 tenants</Text>
-                </SurfaceCard>
-              </Pressable>
+              <PropertyActionCard title="Search property" description="Buy or rent effortlessly" imageSource={searchPropertyTileImage} />
+              <PropertyActionCard title="List Property" description="Verified buyers & 5 tenants" imageSource={listPropertyTileImage} onPress={() => onNavigate('listingWizard')} />
             </View>
 
             <Image
@@ -255,7 +158,7 @@ export function MarketplaceScreen({ onNavigate }: Props) {
 
         <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.xl, gap: spacing.xl }}>
           <View style={{ gap: spacing.md }}>
-            <SectionRow icon={BuildingIcon} title="Listings from your community" />
+            <SectionHeader leadingIcon={BuildingIcon} title="Listings from your community" actionLabel="See all" />
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -286,38 +189,21 @@ export function MarketplaceScreen({ onNavigate }: Props) {
               contentContainerStyle={{ gap: spacing.sm, paddingHorizontal: spacing.md, paddingRight: spacing.xl }}
             >
               {summerFindings.map((card) => (
-                <View
+                <MarketplacePromoCard
                   key={card.title}
-                  style={{
-                    width: `42%`,
-                    height: 148,
-                    flexShrink: 0,
-                    borderRadius: radius.xl,
-                    backgroundColor: card.backgroundColor,
-                    padding: spacing.md,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Text style={[typography.bodyDefaultBold, { color: colors.contentOnDark, width: 64 }]}>{card.title}</Text>
-                  <Image
-                    source={card.imageSource}
-                    resizeMode="cover"
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 88,
-                      opacity: 0.1,
-                    }}
-                  />
-                </View>
+                  {...card}
+                />
               ))}
             </ScrollView>
           </View>
 
           <View style={{ gap: spacing.md }}>
-            <SectionRow icon={Armchair} title="Furniture" subtitle="Explore from 12k+ listings" />
+            <SectionHeader
+              leadingIcon={Armchair}
+              title="Furniture"
+              subtitle="Explore from 12k+ listings"
+              actionLabel="See all"
+            />
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -331,7 +217,12 @@ export function MarketplaceScreen({ onNavigate }: Props) {
           </View>
 
           <View style={{ gap: spacing.md }}>
-            <SectionRow icon={Car} title="Vehicles" subtitle="Explore from 400+ listings" />
+            <SectionHeader
+              leadingIcon={Car}
+              title="Vehicles"
+              subtitle="Explore from 400+ listings"
+              actionLabel="See all"
+            />
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}

@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '../..');
-const scanDirs = ['src'];
+// Token source files are the one place primitive values are defined. UI code
+// must consume their semantic exports instead of repeating literals.
+const scanDirs = ['src/components', 'src/patterns', 'src/screens'];
 const allowedExt = new Set(['.ts', '.tsx']);
 
 function walk(dir, files = []) {

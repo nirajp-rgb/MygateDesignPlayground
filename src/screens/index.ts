@@ -9,4 +9,5 @@ export { ListingWizardScreen } from './ListingWizardScreen';
 export { SearchExperienceScreen } from './SearchExperienceScreen';
 export { FaceCaptureScreen } from './FaceCaptureScreen';
 export { VisitorCalendarScreen } from './VisitorCalendarScreen';
+export { FamilyScreen } from './FamilyScreen';
 export type { PrototypeScreenKey } from './types';

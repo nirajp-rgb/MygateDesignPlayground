@@ -1,0 +1,1 @@
+export { CameraCaptureButton } from './CameraCaptureButton';

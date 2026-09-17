@@ -8,6 +8,8 @@ export default [
       '.expo/**',
       '.parity/**',
       'dist/**',
+      'outputs/**',
+      'storybook-static/**',
       'mobile/**',
       'storybook/node_modules/**',
       'storybook/storybook-static/**'
@@ -28,7 +30,7 @@ export default [
     }
   },
   {
-    files: ['App.tsx', 'src/**/*.{ts,tsx}'],
+    files: ['App.tsx', 'src/components/**/*.{ts,tsx}', 'src/patterns/**/*.{ts,tsx}', 'src/screens/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-syntax': [
         'error',

@@ -1,4 +1,5 @@
-import { ScrollView, Text, View, Pressable } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
 import {
   Bell,
   ShieldWarning,
@@ -21,17 +22,23 @@ import {
   Sun,
   CaretRightIcon,
 } from 'phosphor-react-native';
-import { AppHeader } from '../components/AppHeader';
-import { Avatar } from '../components/Avatar';
-import { SurfaceCard } from '../components/SurfaceCard';
-import { ListItem } from '../components/ListItem';
-import { Switch } from '../components/Switch';
-import { Tag } from '../components/Tag';
-import { Button } from '../components/Button';
-import { appPagePaddingBottom, colors, iconSize, radius, spacing, typography } from '../tokens';
+import {
+  AppHeader,
+  Button,
+  ListGroup,
+  ListItem,
+  IconButton,
+  SectionHeader,
+  SurfaceCard,
+  Switch,
+  Tag,
+  TileGrid,
+} from '../components';
+import { appPagePaddingBottom, colors, iconSize, spacing, typography } from '../tokens';
 import type { Mode } from '../tokens/color';
 import type { IconWeight } from 'phosphor-react-native';
 import type { ImageSourcePropType } from 'react-native';
+import { ProfilePhotoButton } from '../patterns/settings';
 
 type HouseholdTile = {
   icon: React.ComponentType<{ size?: number; color?: string; weight?: IconWeight }>;
@@ -59,43 +66,17 @@ const flats: Flat[] = [
   { label: '8E, Habitat Crest', status: 'Pending approval' },
 ];
 
-function SectionLabel({ title, actionLabel }: { title: string; actionLabel?: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.md }}>
-      <Text style={[typography.bodyLargeBold, { color: colors.contentPrimary }]}>{title}</Text>
-      {actionLabel ? (
-        <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>{actionLabel} </Text>
-      ) : null}
-    </View>
-  );
-}
-
-function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <SurfaceCard borderWidth={0}>
-      <View
-        style={{
-          margin: -spacing.lg,
-          overflow: 'hidden',
-          borderRadius: radius.xl,
-          paddingVertical: spacing.sm,
-        }}
-      >
-        {children}
-      </View>
-    </SurfaceCard>
-  );
-}
-
 type SettingsScreenProps = {
   onBack?: () => void;
   themeMode: Mode;
   onToggleTheme: () => void;
   profilePhotoSource?: ImageSourcePropType;
   onOpenFaceCapture: () => void;
+  onOpenFamily: () => void;
 };
 
-export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoSource, onOpenFaceCapture }: SettingsScreenProps) {
+export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoSource, onOpenFaceCapture, onOpenFamily }: SettingsScreenProps) {
+  const [flashApprovalsEnabled, setFlashApprovalsEnabled] = useState(false);
   return (
     <View style={{ flex: 1, backgroundColor: colors.surfacePageStrong, paddingBottom: appPagePaddingBottom }}>
       <AppHeader
@@ -104,17 +85,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
         titleAlign="left"
         onBack={onBack}
         rightSlot={
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Switch to ${themeMode === 'dark' ? 'light' : 'dark'} mode`}
-            onPress={onToggleTheme}
-          >
-            {themeMode === 'dark' ? (
-              <Sun size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-            ) : (
-              <Moon size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-            )}
-          </Pressable>
+          <IconButton type="Ghost" size="MD" icon={themeMode === 'dark' ? Sun : Moon} accessibilityLabel={`Switch to ${themeMode === 'dark' ? 'light' : 'dark'} mode`} onPress={onToggleTheme} />
         }
       />
 
@@ -127,30 +98,8 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
         <SurfaceCard borderWidth={0} elevated>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xl ,paddingVertical:spacing.lg,paddingHorizontal:spacing.lg}}>
             <View>
-              <Pressable
-                onPress={onOpenFaceCapture}
-                accessibilityRole="button"
-                accessibilityLabel="Capture profile photo"
-                style={{
-                  padding: 4,
-                  borderRadius: radius.pill,
-                  borderWidth: 2,
-                  borderColor: colors.surfaceActionPrimary,
-                }}
-              >
-                <Avatar
-                  size="XXL"
-                  type={profilePhotoSource ? 'Image' : 'Initials'}
-                  name="Niraj Pangarkar"
-                  source={profilePhotoSource}
-                />
-              </Pressable>
-              <Pressable
-                accessibilityLabel="Show QR code"
-                style={{ marginTop: -spacing.xl, alignSelf: 'center', alignItems: 'center', backgroundColor: colors.surfacePrimary, padding: spacing.sm, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.md }}
-              >
-                <QrCode size={iconSize.md} color={colors.contentPrimary} weight="regular" />
-              </Pressable>
+              <ProfilePhotoButton source={profilePhotoSource} name="Niraj Pangarkar" onPress={onOpenFaceCapture} />
+              <View style={{ marginTop: -spacing.xl, alignSelf: 'center' }}><IconButton type="Tertiary" size="SM" icon={QrCode} accessibilityLabel="Show QR code" /></View>
             </View>
 
             <View style={{ flex: 1, gap: spacing.sm }}>
@@ -184,44 +133,15 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
 
         {/* ── Household ──────────────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionLabel title="Household" actionLabel="Manage" />
-          <View style={{ gap: spacing.sm }}>
-          {[0, 1].map(row => (
-            <View key={row} style={{ flexDirection: 'row', gap: spacing.sm }}>
-              {householdTiles.slice(row * 3, row * 3 + 3).map((tile, i) => {
-                const TileIcon = tile.icon;
-                return (
-                  <SurfaceCard key={i} borderWidth={0} style={{ flex: 1, aspectRatio: 1 }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <TileIcon size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-                      <View style={{ width: '100%', alignItems: 'flex-start' }}>
-                        <Text style={typography.bodyDefaultBold} numberOfLines={2}>
-                          {tile.label}
-                        </Text>
-                        <Text style={[typography.bodySmall, { color: colors.contentTertiary, marginTop: 2 }]} numberOfLines={1}>
-                          {tile.subtext}
-                        </Text>
-                      </View>
-                    </View>
-                  </SurfaceCard>
-                );
-              })}
-            </View>
-          ))}
-          </View>
+          <SectionHeader title="Household" actionLabel="Manage" />
+          <TileGrid columns={3} gap={spacing.sm} items={householdTiles.map((tile) => ({ key: tile.label, label: tile.label, sublabel: tile.subtext, artworkType: 'icon', icon: tile.icon, variant: 'card', contentAlign: 'left', onPress: tile.label === 'Family' ? onOpenFamily : undefined }))} />
         </View>
 
         {/* ── Security & Notifications ───────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionLabel title="Security & Notifications" />
+          <SectionHeader title="Security & Notifications" />
           <View style={{ gap: spacing.sm }}>
-          <Card>
+          <ListGroup>
             <ListItem
               label="Notification Settings"
               size="Standard"
@@ -235,7 +155,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
               artwork="Small"
               leadingArtwork={<ShieldWarning size={iconSize.md} color={colors.contentSecondary} weight="regular" />}
             />
-          </Card>
+          </ListGroup>
 
           {/* Flash Approvals */}
           <SurfaceCard borderWidth={0}>
@@ -249,7 +169,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
                 </Text>
               </Text>
             </View>
-            <Switch value="off" />
+            <Switch value={flashApprovalsEnabled ? 'on' : 'off'} onPress={() => setFlashApprovalsEnabled((enabled) => !enabled)} />
             </View>
           </SurfaceCard>
 
@@ -272,8 +192,8 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
 
         {/* ── Manage Flats ───────────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionLabel title="Manage Flats" />
-          <Card>
+          <SectionHeader title="Manage Flats" />
+          <ListGroup>
           {flats.map((flat, i) => (
             <ListItem
               key={i}
@@ -304,13 +224,13 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
             labelStyle={{ ...typography.bodyDefaultBold, color: colors.contentAction }}
             controlElement={null}
           />
-        </Card>
+        </ListGroup>
         </View>
 
         {/* ── Purchases ──────────────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionLabel title="Purchases" />
-          <Card>
+          <SectionHeader title="Purchases" />
+          <ListGroup>
           <ListItem
             label="My Orders"
             size="Standard"
@@ -324,13 +244,13 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
             artwork="Small"
             leadingArtwork={<CreditCard size={iconSize.md} color={colors.contentSecondary} weight="regular" />}
           />
-        </Card>
+        </ListGroup>
         </View>
 
         {/* ── General Settings ───────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionLabel title="General settings" />
-          <Card>
+          <SectionHeader title="General settings" />
+          <ListGroup>
           <ListItem
             label="Support & Feedback"
             size="Standard"
@@ -358,7 +278,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
             artwork="Small"
             leadingArtwork={<SignOut size={iconSize.md} color={colors.contentSecondary} weight="regular" />}
           />
-        </Card>
+        </ListGroup>
         </View>
 
         {/* ── Footer ─────────────────────────────────────────── */}

@@ -3,7 +3,7 @@ import { Archivo_400Regular, Archivo_600SemiBold, useFonts } from '@expo-google-
 import { StatusBar } from 'expo-status-bar';
 import type { Mode } from './src/tokens/color';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { HomeScreen, TemplateScreen, SettingsScreen, DailyHelpProfileScreen, AppHomeScreen, MarketplaceScreen, QuickActionsScreen, ListingWizardScreen, SearchExperienceScreen, FaceCaptureScreen, VisitorCalendarScreen, type PrototypeScreenKey } from './src/screens';
+import { HomeScreen, TemplateScreen, SettingsScreen, DailyHelpProfileScreen, AppHomeScreen, MarketplaceScreen, QuickActionsScreen, ListingWizardScreen, SearchExperienceScreen, FaceCaptureScreen, VisitorCalendarScreen, FamilyScreen, type PrototypeScreenKey } from './src/screens';
 import type { DailyHelpProfileVisitor } from './src/screens/types';
 import type { ImageSourcePropType } from 'react-native';
 import { currentMode, getStatusBarStyle, setUIMode } from './src/tokens';
@@ -51,7 +51,10 @@ export default function App() {
           onToggleTheme={handleToggleTheme}
           profilePhotoSource={profilePhotoSource}
           onOpenFaceCapture={() => navigateTo('faceCapture')}
+          onOpenFamily={() => setActiveScreen('family')}
         />
+      ) : activeScreen === 'family' ? (
+        <FamilyScreen key={`family-${themeMode}`} onBack={() => setActiveScreen('settings')} />
       ) : activeScreen === 'dailyHelpProfile' ? (
         <DailyHelpProfileScreen
           key={`dailyHelpProfile-${themeMode}-${selectedHelpProfile?.name ?? 'default'}`}

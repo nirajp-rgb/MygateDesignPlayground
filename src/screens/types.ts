@@ -11,7 +11,8 @@ export type PrototypeScreenKey =
   | 'listingWizard'
   | 'searchExperience'
   | 'faceCapture'
-  | 'visitorCalendar';
+  | 'visitorCalendar'
+  | 'family';
 
 export type DailyHelpProfileVisitor = {
   name: string;

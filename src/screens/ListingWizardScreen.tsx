@@ -1,12 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Keyboard, LayoutAnimation, Platform, Pressable, ScrollView, Text, TextInput, UIManager, View } from 'react-native';
-import { CalendarBlank, House, Buildings, ImageIcon, LightbulbIcon, Plus, X } from 'phosphor-react-native';
+import { Image, Keyboard, LayoutAnimation, Platform, ScrollView, Text, UIManager, View } from 'react-native';
+import type { TextInput } from 'react-native';
+import { House, Buildings, LightbulbIcon } from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppHeader } from '../components/AppHeader';
-import { Button } from '../components/Button';
-import { SurfaceCard } from '../components/SurfaceCard';
-import { colors, iconSize, radius, spacing, typography } from '../tokens';
+import { AppHeader, Button, SurfaceCard } from '../components';
+import { ProgressSteps, TextField } from '../components';
+import { colors, iconSize, spacing, typography } from '../tokens';
 import type { PrototypeScreenKey } from './types';
+import logoAnimationSource from '../assets/logoAnimation.gif';
+import livingRoomPhoto from '../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png';
+import bedroomPhoto from '../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png';
+import kitchenPhoto from '../assets/MarketplaceITems/D532470A-D6BC-4023-BA67-2E4A7F5ED952.png';
+import balconyPhoto from '../assets/MarketplaceITems/126660A4-6E8E-4024-AA49-9D1141CC2244.png';
+import {
+  ListingChoiceTiles as ChoiceTiles,
+  ListingDateField,
+  ListingPhotoGrid as PhotoCarousel,
+  ListingPillGroup as ChoicePills,
+  ListingPillGroup as ScrollPills,
+  ListingSummaryRow as SummaryRow,
+  ListingSummarySegments as SummaryWrappedSegments,
+} from '../patterns/listing';
 
 type Props = {
   activeScreen: PrototypeScreenKey;
@@ -100,23 +114,22 @@ const b102HomeDetailsPrefill: Pick<ListingDraft, 'propertyType' | 'bhk' | 'built
   totalFloors: '14',
   furnishing: ''
 };
-const logoAnimationSource = require('../assets/logoAnimation.gif');
 const listingPhotoLibrary = [
   {
     label: 'Living room',
-    source: require('../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png')
+    source: livingRoomPhoto
   },
   {
     label: 'Bedroom',
-    source: require('../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png')
+    source: bedroomPhoto
   },
   {
     label: 'Kitchen',
-    source: require('../assets/MarketplaceITems/D532470A-D6BC-4023-BA67-2E4A7F5ED952.png')
+    source: kitchenPhoto
   },
   {
     label: 'Balcony',
-    source: require('../assets/MarketplaceITems/126660A4-6E8E-4024-AA49-9D1141CC2244.png')
+    source: balconyPhoto
   }
 ] as const;
 
@@ -171,26 +184,7 @@ function getDepositSummary(draft: ListingDraft) {
 }
 
 function ProgressSegments({ currentStep }: { currentStep: number }) {
-  return (
-    <View style={{ flexDirection: 'row', gap: spacing.xs }}>
-      {steps.map((step, index) => {
-        const isActive = index === currentStep;
-        const isComplete = index < currentStep;
-        return (
-          <View
-            key={step.key}
-            style={{
-              flex: 1,
-              height: 6,
-              borderRadius: radius.pill,
-              backgroundColor: isComplete || isActive ? colors.contentPrimary : colors.borderDefault,
-              opacity: isActive ? 1 : isComplete ? 0.72 : 1
-            }}
-          />
-        );
-      })}
-    </View>
-  );
+  return <ProgressSteps currentIndex={currentStep} total={steps.length} accessibilityLabel="Listing progress" />;
 }
 
 function InputField({
@@ -218,52 +212,7 @@ function InputField({
   required?: boolean;
   minHeight?: number;
 }) {
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <FieldLabel label={label} required={required} />
-      <View
-        style={[
-          {
-            minHeight: multiline ? minHeight ?? 156 : 60,
-            borderRadius: radius.xl,
-            borderWidth: 1,
-            borderColor: colors.borderDefault,
-            backgroundColor: colors.surfacePrimary,
-            paddingHorizontal: spacing.lg,
-            paddingVertical: spacing.md,
-            flexDirection: 'row',
-            alignItems: multiline ? 'flex-start' : 'center',
-            gap: spacing.sm
-          }
-        ]}
-      >
-        <TextInput
-          ref={inputRef}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor={colors.contentTertiary}
-          keyboardType={keyboardType}
-          multiline={multiline}
-          onFocus={onFocus}
-          textAlignVertical={multiline ? 'top' : 'center'}
-          style={[
-            typography.bodyLarge,
-            {
-              flex: 1,
-              color: colors.contentPrimary,
-              paddingVertical: 0
-            }
-          ]}
-        />
-        {suffix ? (
-          <Text style={[typography.bodyDefault, { color: colors.contentSecondary, paddingTop: multiline ? spacing.xs : 0 }]}>
-            {suffix}
-          </Text>
-        ) : null}
-      </View>
-    </View>
-  );
+  return <TextField label={label} required={required} value={value} onChangeText={onChangeText} placeholder={placeholder} keyboardType={keyboardType} multiline={multiline} suffix={suffix} inputRef={inputRef} onFocus={onFocus} minHeight={minHeight} />;
 }
 
 function CurrencyInputField({
@@ -285,292 +234,14 @@ function CurrencyInputField({
 }) {
   const displayValue = value ? `₹ ${formatIndianNumber(value)}` : '';
 
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <FieldLabel label={label} required={required} />
-      <TextInput
-        ref={inputRef}
-        value={displayValue}
-        onChangeText={(text) => onChangeText(text.replace(/[^0-9]/g, ''))}
-        placeholder={placeholder}
-        placeholderTextColor={colors.contentTertiary}
-        keyboardType="numeric"
-        onFocus={onFocus}
-        style={[
-          typography.bodyLarge,
-          {
-            minHeight: 60,
-            borderRadius: radius.xl,
-            borderWidth: 1,
-            borderColor: colors.borderDefault,
-            backgroundColor: colors.surfacePrimary,
-            color: colors.contentPrimary,
-            paddingHorizontal: spacing.lg,
-            paddingVertical: spacing.md
-          }
-        ]}
-      />
-    </View>
-  );
+  return <TextField label={label} required={required} value={value} onChangeText={onChangeText} placeholder={placeholder} keyboardType="numeric" inputRef={inputRef} onFocus={onFocus} formatDisplayValue={() => displayValue} parseInputValue={(text) => text.replace(/[^0-9]/g, '')} />;
 }
 
 function FieldLabel({ label, required = false }: { label: string; required?: boolean }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
       <Text style={typography.bodyDefault}>{label}</Text>
       {required ? <Text style={[typography.bodyDefaultBold, { color: colors.contentNegative }]}>*</Text> : null}
-    </View>
-  );
-}
-
-function ChoiceTiles<T extends string>({
-  value,
-  options,
-  onSelect,
-  layout = 'center',
-}: {
-  value: T | '';
-  options: ReadonlyArray<{ value: T; label: string; description?: string; icon?: React.ReactNode }>;
-  onSelect: (value: T) => void;
-  layout?: 'center' | 'row';
-}) {
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
-      {options.map((option) => {
-        const isActive = option.value === value;
-        return (
-          <Pressable
-            key={option.value}
-            onPress={() => onSelect(option.value)}
-            style={{
-              width: '48%',
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.md,
-              borderRadius: radius.xl,
-              borderWidth: isActive ? 2 : 1,
-              borderColor: isActive ? colors.contentAction : colors.borderDefault,
-              backgroundColor: colors.surfacePrimary,
-              gap: layout === 'row' ? spacing.sm : 2,
-              flexDirection: layout === 'row' ? 'row' : 'column',
-              alignItems: layout === 'row' ? 'center' : 'center',
-              justifyContent: layout === 'row' ? 'center' : 'center',
-              minHeight: 76,
-            }}
-          >
-            {option.icon ? option.icon : null}
-            <Text style={[typography.bodyDefaultBold, { color: isActive ? colors.contentAction : colors.contentPrimary, textAlign: layout === 'row' ? 'left' : 'center' }]}>
-              {option.label}
-            </Text>
-            {option.description && layout === 'center' ? (
-              <Text style={[typography.bodyDefault, { color: colors.contentSecondary, textAlign: 'center' }]}>
-                {option.description}
-              </Text>
-            ) : null}
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-function ScrollPills<T extends string>({
-  value,
-  options,
-  onSelect,
-}: {
-  value: T | '';
-  options: readonly T[];
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md }}>
-      {options.map((option) => {
-        const isActive = option === value;
-        return (
-          <Pressable
-            key={option}
-            onPress={() => onSelect(option)}
-            style={{
-              paddingHorizontal: spacing.lg,
-              paddingVertical: spacing.md,
-              borderRadius: radius.pill,
-              borderWidth: isActive ? 2 : 1,
-              borderColor: isActive ? colors.contentAction : colors.borderDefault,
-              backgroundColor: colors.surfacePrimary,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text style={[typography.bodyDefaultBold, { color: isActive ? colors.contentAction : colors.contentPrimary }]}>
-              {option}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
-  );
-}
-
-function ChoicePills<T extends string>({
-  value,
-  options,
-  onSelect,
-  columns = 2,
-  hugContent = false,
-}: {
-  value: T | '';
-  options: readonly T[];
-  onSelect: (value: T) => void;
-  columns?: number;
-  hugContent?: boolean;
-}) {
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
-      {options.map((option) => {
-        const isActive = option === value;
-        return (
-          <Pressable
-            key={option}
-            onPress={() => onSelect(option)}
-            style={{
-              minWidth: columns === 1 ? '100%' : undefined,
-              flex: hugContent ? undefined : columns === 2 ? 1 : undefined,
-              flexGrow: hugContent ? 0 : columns === 2 ? 1 : 0,
-              paddingHorizontal: spacing.lg,
-              paddingVertical: spacing.md,
-              borderRadius: radius.pill,
-              borderWidth: isActive ? 2 : 1,
-              borderColor: isActive ? colors.contentAction : colors.borderDefault,
-              backgroundColor: colors.surfacePrimary,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={[typography.bodyDefaultBold, { color: isActive ? colors.contentAction : colors.contentPrimary }]}>{option}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ gap: 2 }}>
-      <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>{label}</Text>
-      <Text style={typography.bodyDefaultBold}>{value}</Text>
-    </View>
-  );
-}
-
-function SummaryInlineRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing.md }}>
-      <Text style={[typography.bodyDefault, { color: colors.contentSecondary, flex: 0.9 }]}>{label}</Text>
-      <Text
-        numberOfLines={1}
-        style={[typography.bodyDefaultBold, { color: colors.contentPrimary, flex: 1.4, textAlign: 'right' }]}
-      >
-        {value}
-      </Text>
-    </View>
-  );
-}
-
-function SummaryWrappedSegments({ items }: { items: string[] }) {
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing.xs, columnGap: spacing.xs }}>
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1;
-        return (
-          <View key={`${item}-${index}`} style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={[typography.bodyLarge, { color: colors.contentPrimary }]}>{item}</Text>
-            {isLast ? null : (
-              <Text style={[typography.bodyLarge, { color: colors.borderDefault, marginHorizontal: spacing.sm }]}>
-                •
-              </Text>
-            )}
-          </View>
-        );
-      })}
-    </View>
-  );
-}
-
-function PhotoCarousel({
-  photos,
-  variant = 'summary',
-  onAddPhoto,
-  onRemovePhoto,
-}: {
-  photos: Array<{ label: string; source: any }>;
-  variant?: 'editable' | 'summary';
-  onAddPhoto?: () => void;
-  onRemovePhoto?: (label: string) => void;
-}) {
-  const isEditable = variant === 'editable';
-  const tileWidth = isEditable ? '48%' : '23%';
-  const rowGap = isEditable ? spacing.md : spacing.sm;
-
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap }}>
-      {photos.map((photo) => (
-        <View
-          key={photo.label}
-          style={{
-            width: tileWidth,
-            minWidth: tileWidth,
-            maxWidth: tileWidth,
-            aspectRatio: 1,
-            borderRadius: radius.lg,
-            overflow: 'hidden',
-            backgroundColor: colors.surfaceSecondary
-          }}
-        >
-          <Image source={photo.source} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-          {isEditable && onRemovePhoto ? (
-            <Pressable
-              onPress={() => onRemovePhoto(photo.label)}
-              style={{
-                position: 'absolute',
-                top: spacing.xs,
-                right: spacing.xs,
-                width: 24,
-                height: 24,
-                borderRadius: radius.pill,
-                backgroundColor: 'rgba(17, 24, 39, 0.72)',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <X size={12} color={colors.contentOnDark} weight="bold" />
-            </Pressable>
-          ) : null}
-        </View>
-      ))}
-
-      {isEditable && onAddPhoto ? (
-        <Pressable
-          onPress={onAddPhoto}
-          style={{
-            width: tileWidth,
-            minWidth: tileWidth,
-            maxWidth: tileWidth,
-            aspectRatio: 1,
-            borderRadius: radius.lg,
-            borderWidth: 1,
-            borderStyle: 'dashed',
-            borderColor: colors.borderDefault,
-            backgroundColor: colors.surfaceSecondary,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: spacing.xs,
-            paddingHorizontal: spacing.md
-          }}
-        >
-          <Plus size={24} color={colors.contentAction} weight="bold" />
-          <Text style={[typography.bodyDefaultBold, { color: colors.contentAction, textAlign: 'center' }]}>Add photos</Text>
-        </Pressable>
-      ) : null}
     </View>
   );
 }
@@ -793,10 +464,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
     });
   };
 
-  const handleInputFocus = (
-    key: string,
-    inputRef: React.RefObject<TextInput | null>
-  ) => {
+  const handleInputFocus = (key: string) => {
     activeFieldKey.current = key;
     requestAnimationFrame(() => {
       scrollFieldIntoView(key);
@@ -829,15 +497,9 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
     scrollRef.current?.scrollTo({ x: 0, y: Math.max(0, absoluteY - spacing.md), animated: true });
   };
 
-  const scrollToCard = (index: number) => {
-    const layout = cardLayouts[index];
-    if (!layout) return;
-    scrollToCardY(layout.y);
-  };
-
   const handleBack = () => {
     clearHomeDetailsPrefill();
-    onNavigate('appHome');
+    onExit();
   };
 
   const handleNext = () => {
@@ -902,26 +564,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <View style={{ gap: spacing.sm }}>
         <FieldLabel label="Property" required />
         <View style={{ gap: spacing.md }}>
-          {propertyOptions.map((option) => {
-            const isActive = option === draft.property;
-            return (
-              <Pressable
-                key={option}
-                onPress={() => updateDraft('property', option)}
-                style={{
-                  width: '100%',
-                  padding: spacing.lg,
-                  borderRadius: radius.pill,
-                  borderWidth: isActive ? 2 : 1,
-                  borderColor: isActive ? colors.contentAction : colors.borderDefault,
-                  backgroundColor: colors.surfacePrimary,
-                  gap: spacing.xs
-                }}
-              >
-                <Text style={[typography.bodyDefaultBold, { textAlign: 'center', color: isActive ? colors.contentAction : colors.contentPrimary }]}>{option}</Text>
-              </Pressable>
-            );
-          })}
+          <ChoicePills value={draft.property} options={propertyOptions} onSelect={(value) => updateDraft('property', value)} columns={1} />
         </View>
       </View>
 
@@ -932,25 +575,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
 
       <View style={{ gap: spacing.sm }}>
         <FieldLabel label="Available from" required />
-        <Pressable
-          onPress={() => updateDraft('availability', draft.availability ? '1 Jul 2026' : '25 Jun 2026')}
-          style={{
-            minHeight: 60,
-            borderRadius: radius.xl,
-            borderWidth: 1,
-            borderColor: colors.borderDefault,
-            backgroundColor: colors.surfacePrimary,
-            paddingHorizontal: spacing.lg,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <Text style={[typography.bodyLarge, { color: draft.availability ? colors.contentPrimary : colors.contentTertiary }]}>
-            {draft.availability || 'Select move-in date'}
-          </Text>
-          <CalendarBlank size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-        </Pressable>
+        <ListingDateField value={draft.availability} placeholder="Select move-in date" onPress={() => updateDraft('availability', draft.availability ? '1 Jul 2026' : '25 Jun 2026')} />
       </View>
     </View>
   );
@@ -1008,7 +633,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <View style={{ gap: spacing.sm }}>
         <FieldLabel label="BHK" required />
         {flowVariant === 'stacked' ? (
-          <ScrollPills value={draft.bhk} options={bhkOptions} onSelect={(value) => updateDraft('bhk', value)} />
+          <ScrollPills layout="horizontal" value={draft.bhk} options={bhkOptions} onSelect={(value) => updateDraft('bhk', value)} />
         ) : (
           <ChoicePills value={draft.bhk} options={bhkOptions} onSelect={(value) => updateDraft('bhk', value)} columns={3} />
         )}
@@ -1024,7 +649,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           placeholder="Enter built-up area in sqft"
           keyboardType="numeric"
           suffix="Sqft."
-          onFocus={() => handleInputFocus('builtUpArea', builtUpAreaInputRef)}
+          onFocus={() => handleInputFocus('builtUpArea')}
         />
       </View>
 
@@ -1040,7 +665,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
                 onChangeText={(value) => updateDraft('floor', value.replace(/[^0-9]/g, ''))}
                 placeholder="Floor number"
                 keyboardType="numeric"
-                onFocus={() => handleInputFocus('floor', floorInputRef)}
+                onFocus={() => handleInputFocus('floor')}
               />
             </View>
           </View>
@@ -1054,7 +679,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
                 onChangeText={(value) => updateDraft('totalFloors', value.replace(/[^0-9]/g, ''))}
                 placeholder="Total floors"
                 keyboardType="numeric"
-                onFocus={() => handleInputFocus('totalFloors', totalFloorsInputRef)}
+                onFocus={() => handleInputFocus('totalFloors')}
               />
             </View>
           </View>
@@ -1064,7 +689,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <View style={{ gap: spacing.sm }}>
         <FieldLabel label="Furnishing" required />
         {flowVariant === 'stacked' ? (
-          <ScrollPills value={draft.furnishing} options={furnishingOptions} onSelect={(value) => updateDraft('furnishing', value)} />
+          <ScrollPills layout="horizontal" value={draft.furnishing} options={furnishingOptions} onSelect={(value) => updateDraft('furnishing', value)} />
         ) : (
           <ChoicePills
             value={draft.furnishing}
@@ -1083,7 +708,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <SurfaceCard style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.surfaceActionSecondarySubtle, borderWidth: 0 }}>
         {/* <Text style={typography.bodyDefaultBold}>Estimated rent</Text> */}
         <LightbulbIcon size={iconSize.lg} color={colors.contentAction} weight="regular" />
-        <Text style={[typography.bodySmall, { color: colors.contentSecondary, flex: 1, lineHeight: 18 }]}>
+            <Text style={[typography.bodySmall, { color: colors.contentSecondary, flex: 1 }]}>
           Based on recent price trends, the estimated rent for your property is around ₹ 42,000 - ₹ 48,000.
         </Text>
       </SurfaceCard>
@@ -1095,7 +720,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           value={draft.rent}
           onChangeText={(value) => updateDraft('rent', value.replace(/[^0-9]/g, ''))}
           placeholder="Ex. ₹ 45,000"
-          onFocus={() => handleInputFocus('rent', rentInputRef)}
+          onFocus={() => handleInputFocus('rent')}
         />
       </View>
       <View ref={setFieldContainerRef('maintenance')}>
@@ -1105,7 +730,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           value={draft.maintenance}
           onChangeText={(value) => updateDraft('maintenance', value.replace(/[^0-9]/g, ''))}
           placeholder="Ex. ₹ 3,500"
-          onFocus={() => handleInputFocus('maintenance', maintenanceInputRef)}
+          onFocus={() => handleInputFocus('maintenance')}
         />
       </View>
       <View style={{ gap: spacing.sm }}>
@@ -1143,7 +768,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
             value={draft.deposit}
             onChangeText={(value) => updateDraft('deposit', value.replace(/[^0-9]/g, ''))}
             placeholder="Ex. ₹ 90,000"
-            onFocus={() => handleInputFocus('deposit', depositInputRef)}
+            onFocus={() => handleInputFocus('deposit')}
           />
         </View>
       ) : null}
@@ -1158,33 +783,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
             The first image will be used as the cover photo in the feed and preview.
           </Text>
         </View>
-        {!draft.coverPhotoAdded ? (
-          <Pressable
-            onPress={activatePhotoSelection}
-            style={{
-              minHeight: 180,
-              borderRadius: radius.xl,
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              borderColor: colors.borderDefault,
-              backgroundColor: colors.surfaceSecondary,
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: spacing.sm
-            }}
-          >
-            <ImageIcon size={iconSize.xl} color={colors.contentAction} weight="regular" />
-            <Text style={typography.bodyDefaultBold}>Tap to add photos</Text>
-            <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>No watermarks. Bright daytime shots work best.</Text>
-          </Pressable>
-        ) : (
-          <PhotoCarousel
-            photos={selectedListingPhotos as Array<{ label: string; source: any }>}
-            variant="editable"
-            onAddPhoto={addGalleryPhoto}
-            onRemovePhoto={removeGalleryPhoto}
-          />
-        )}
+        <PhotoCarousel photos={selectedListingPhotos} variant="editable" onAddPhoto={draft.coverPhotoAdded ? addGalleryPhoto : activatePhotoSelection} onRemovePhoto={removeGalleryPhoto} />
         {!draft.coverPhotoAdded ? (
           <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>You can skip this for now and add photos later.</Text>
         ) : null}
@@ -1204,7 +803,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           placeholder="Eg: Semi-furnished family home with wardrobes, modular kitchen, and good cross-ventilation."
           multiline
           minHeight={240}
-          onFocus={() => handleInputFocus('description', descriptionInputRef)}
+          onFocus={() => handleInputFocus('description')}
         />
       </View>
     </View>
@@ -1222,9 +821,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <SurfaceCard>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={typography.bodyLargeBold}>Basics</Text>
-          <Pressable onPress={() => setCurrentStep(0)}>
-            <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Edit</Text>
-          </Pressable>
+          <Button kind="Link" size="SM" label="Edit" onPress={() => setCurrentStep(0)} />
         </View>
         <SummaryRow label="Property" value={draft.property} />
         <SummaryRow label="Listing type" value={draft.listingType || '--'} />
@@ -1234,9 +831,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <SurfaceCard>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={typography.bodyLargeBold}>Home details</Text>
-          <Pressable onPress={() => setCurrentStep(1)}>
-            <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Edit</Text>
-          </Pressable>
+          <Button kind="Link" size="SM" label="Edit" onPress={() => setCurrentStep(1)} />
         </View>
         <SummaryRow label="Configuration" value={`${draft.propertyType || '--'} • ${draft.bhk || '--'}`} />
         <SummaryRow label="Area" value={formatArea(draft.builtUpArea)} />
@@ -1247,9 +842,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <SurfaceCard>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={typography.bodyLargeBold}>Pricing</Text>
-          <Pressable onPress={() => setCurrentStep(2)}>
-            <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Edit</Text>
-          </Pressable>
+          <Button kind="Link" size="SM" label="Edit" onPress={() => setCurrentStep(2)} />
         </View>
         <SummaryRow label="Deposit" value={getDepositSummary(draft)} />
         <SummaryRow label="Monthly rent" value={formatCurrency(draft.rent)} />
@@ -1259,14 +852,12 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
       <SurfaceCard>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={typography.bodyLargeBold}>Photos & description</Text>
-          <Pressable onPress={() => setCurrentStep(3)}>
-            <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Edit</Text>
-          </Pressable>
+          <Button kind="Link" size="SM" label="Edit" onPress={() => setCurrentStep(3)} />
         </View>
         <View style={{ gap: spacing.sm }}>
           <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>Property photos</Text>
           {hasSelectedPhotos ? (
-            <PhotoCarousel photos={selectedListingPhotos as Array<{ label: string; source: any }>} variant="summary" />
+            <PhotoCarousel photos={selectedListingPhotos} variant="summary" />
           ) : (
             <Text style={typography.bodyDefault}>No photos added yet</Text>
           )}
@@ -1321,7 +912,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           <View style={{ gap: spacing.md }}>
             <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>Property photos</Text>
             {hasSelectedPhotos ? (
-              <PhotoCarousel photos={selectedListingPhotos as Array<{ label: string; source: any }>} variant="summary" />
+              <PhotoCarousel photos={selectedListingPhotos} variant="summary" />
             ) : (
               <Text style={typography.bodyDefault}>No photos added yet</Text>
             )}
@@ -1353,7 +944,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
           title={flowVariant === 'stacked' ? 'List your home' : 'List your home'}
           titleAlign="left"
           rightSlot={
-            <Pressable onPress={() => {
+            <Button kind="Link" size="SM" label="Save draft" onPress={() => {
               if (flowVariant === 'stepByStep') {
                 animateSectionTransition();
                 setFlowVariant('stacked');
@@ -1366,9 +957,7 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
               animateSectionTransition();
               setFlowVariant('stepByStep');
               setCurrentStep(stackedActiveStep === -1 ? steps.length - 1 : Math.min(stackedActiveStep, steps.length - 1));
-            }}>
-              <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Save draft</Text>
-            </Pressable>
+            }} />
           }
         />
       </View>
@@ -1473,15 +1062,13 @@ export function ListingWizardScreen({ onNavigate, onExit }: Props) {
                           <Text style={typography.titleSubsection}>{step.title}</Text>
                         </View>
                         {isSubmitted && !isFocused ? (
-                          <Pressable
+                          <Button kind="Link" size="SM" label="Edit"
                             onPress={() => {
                               animateSectionTransition();
                               setStackedActiveStep(index);
                               pendingScrollIndex.current = index;
                             }}
-                          >
-                            <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>Edit</Text>
-                          </Pressable>
+                          />
                         ) : null}
                       </View>
                       {isPreviewState ? <View style={{ marginTop:spacing.md,height: 1, backgroundColor: colors.borderDefault }} /> : null}

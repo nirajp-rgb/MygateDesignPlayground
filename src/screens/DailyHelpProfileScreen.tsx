@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import {
   Phone,
   ShareNetwork,
@@ -17,17 +17,19 @@ import {
   Clock,
 } from 'phosphor-react-native';
 import type { IconWeight } from 'phosphor-react-native';
-import { AppHeader } from '../components/AppHeader';
-import { Avatar } from '../components/Avatar';
-import { Button } from '../components/Button';
-import { IconButton } from '../components/IconButton';
-import { ListItem } from '../components/ListItem';
-import { ReviewCard } from '../components/ReviewCard';
-import { SectionHeader } from '../components/SectionHeader';
-import { SurfaceCard } from '../components/SurfaceCard';
-import { Switch } from '../components/Switch';
-import { Tag } from '../components/Tag';
-import { Tile } from '../components/Tile';
+import {
+  AppHeader,
+  Avatar,
+  Button,
+  IconButton,
+  ListItem,
+  ReviewCard,
+  SectionHeader,
+  SurfaceCard,
+  Switch,
+  Tag,
+  Tile,
+} from '../components';
 import { appPagePaddingBottom, colors, iconSize, spacing, typography } from '../tokens';
 import type { DailyHelpProfileVisitor, PrototypeScreenKey } from './types';
 
@@ -153,11 +155,7 @@ export function DailyHelpProfileScreen({ onNavigate, onBack, visitor }: Props) {
           <SectionHeader
             title="Notification posture"
             rightSlot={
-              <Pressable onPress={() => setNotifExpanded(v => !v)} hitSlop={8}>
-                {notifExpanded
-                  ? <CaretUp size={iconSize.md} color={colors.contentTertiary} weight="regular" />
-                  : <CaretDown size={iconSize.md} color={colors.contentTertiary} weight="regular" />}
-              </Pressable>
+              <IconButton type="Ghost" size="SM" icon={notifExpanded ? CaretUp : CaretDown} accessibilityLabel={`${notifExpanded ? 'Collapse' : 'Expand'} notification posture`} onPress={() => setNotifExpanded(v => !v)} />
             }
           />
           {notifExpanded && (
@@ -251,11 +249,7 @@ export function DailyHelpProfileScreen({ onNavigate, onBack, visitor }: Props) {
             title={`Works in ${workplaces.length} houses`}
             subtitle="Working in your society for 5 Years"
             rightSlot={
-              <Pressable onPress={() => setWorksExpanded(v => !v)} hitSlop={8}>
-                {worksExpanded
-                  ? <CaretUp size={iconSize.md} color={colors.contentTertiary} weight="regular" />
-                  : <CaretDown size={iconSize.md} color={colors.contentTertiary} weight="regular" />}
-              </Pressable>
+              <IconButton type="Ghost" size="SM" icon={worksExpanded ? CaretUp : CaretDown} accessibilityLabel={`${worksExpanded ? 'Collapse' : 'Expand'} workplaces`} onPress={() => setWorksExpanded(v => !v)} />
             }
           />
 

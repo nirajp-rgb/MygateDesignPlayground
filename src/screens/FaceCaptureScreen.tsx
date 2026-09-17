@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { ArrowLeft, Camera, WarningCircle } from 'phosphor-react-native';
+import { ArrowLeft, WarningCircle } from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button } from '../components/Button';
-import { colors, iconSize, radius, spacing, typography } from '../tokens';
+import { Button, IconButton } from '../components';
+import { colors, radius, spacing, typography } from '../tokens';
+import { CameraCaptureButton } from '../patterns/camera';
 
 type Props = {
   onBack: () => void;
@@ -42,9 +43,7 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.surfacePageStrong, paddingTop: insets.top, paddingHorizontal: spacing.md, paddingBottom: insets.bottom + spacing.xl }}>
         <View style={{ minHeight: 56, justifyContent: 'center' }}>
-          <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10}>
-            <ArrowLeft size={iconSize.md} color={colors.contentPrimary} weight="regular" />
-          </Pressable>
+          <IconButton type="Ghost" size="MD" icon={ArrowLeft} accessibilityLabel="Go back" onPress={onBack} />
         </View>
         <View style={{ flex: 1, justifyContent: 'center', gap: spacing.xl }}>
           <View
@@ -73,12 +72,10 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
 
   if (previewUri) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      <View style={{ flex: 1, backgroundColor: colors.contentOnLight }}>
         <View style={{ paddingTop: insets.top, paddingHorizontal: spacing.md, paddingBottom: spacing.md }}>
           <View style={{ minHeight: 56, justifyContent: 'center' }}>
-            <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10}>
-              <ArrowLeft size={iconSize.md} color={colors.contentOnDark} weight="regular" />
-            </Pressable>
+            <IconButton type="Ghost" size="MD" icon={ArrowLeft} iconColor={colors.contentOnDark} accessibilityLabel="Go back" onPress={onBack} />
           </View>
         </View>
 
@@ -101,7 +98,7 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
             paddingHorizontal: spacing.md,
             paddingTop: spacing.lg,
             paddingBottom: insets.bottom + spacing.lg,
-            backgroundColor: '#000000'
+            backgroundColor: colors.contentOnLight
           }}
         >
           <View style={{ flexDirection: 'row', gap: spacing.sm }}>
@@ -118,7 +115,7 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <View style={{ flex: 1, backgroundColor: colors.contentOnLight }}>
       <CameraView ref={cameraRef} style={{ flex: 1 }} facing="front" />
 
       <View
@@ -132,9 +129,7 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
         }}
       >
         <View style={{ minHeight: 56, justifyContent: 'center' }}>
-          <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10}>
-            <ArrowLeft size={iconSize.md} color={colors.contentOnDark} weight="regular" />
-          </Pressable>
+          <IconButton type="Ghost" size="MD" icon={ArrowLeft} iconColor={colors.contentOnDark} accessibilityLabel="Go back" onPress={onBack} />
         </View>
 
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -153,30 +148,13 @@ export function FaceCaptureScreen({ onBack, onSubmit }: Props) {
         <View style={{ gap: spacing.lg }}>
           <View style={{ gap: spacing.xs, alignItems: 'center' }}>
             <Text style={[typography.titleSubsection, { color: colors.contentOnDark }]}>Align your face inside the guide</Text>
-            <Text style={[typography.bodyDefault, { color: '#D0D5DD', textAlign: 'center' }]}>
+            <Text style={[typography.bodyDefault, { color: colors.contentOnDark, opacity: 0.8, textAlign: 'center' }]}>
               Remove hats, sunglasses, and face masks before capturing your photo.
             </Text>
           </View>
 
-          <Pressable
-            onPress={handleCapture}
-            accessibilityRole="button"
-            accessibilityLabel="Capture face photo"
-            style={{
-              alignSelf: 'center',
-              width: 78,
-              height: 78,
-              borderRadius: radius.pill,
-              borderWidth: 6,
-              borderColor: colors.contentOnDark,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(255,255,255,0.12)'
-            }}
-          >
-            <Camera size={28} color={colors.contentOnDark} weight="regular" />
-          </Pressable>
-          <Text style={[typography.bodySmall, { color: '#D0D5DD', textAlign: 'center' }]}>Capture</Text>
+          <CameraCaptureButton onPress={handleCapture} disabled={isCapturing} />
+          <Text style={[typography.bodySmall, { color: colors.contentOnDark, opacity: 0.8, textAlign: 'center' }]}>Capture</Text>
         </View>
       </View>
     </View>

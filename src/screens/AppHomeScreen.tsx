@@ -4,49 +4,55 @@
 
 import { useRef, useState } from 'react';
 import type { ComponentType } from 'react';
-import { Animated, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, ScrollView, Text, View } from 'react-native';
 import type { NativeSyntheticEvent, NativeScrollEvent, ScrollView as ScrollViewType } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   MagnifyingGlass, Bell, CaretDown, CaretRight,
-  ThumbsUp, ChatCircle, ShareNetwork, DotsThreeVertical,
-  Users, Wrench, Storefront,
+  ChatCircle,
+  Wrench, Storefront,
   Tag as TagIcon, MapPin, Buildings,
   UserCheckIcon,
   CurrencyInrIcon,
-  SwimmingPoolIcon,
   TennisBallIcon,
-  ClipboardIcon,
   ClipboardTextIcon,
   CirclesThreePlusIcon,
-  House,
-  PlusCircle,
   NewspaperIcon,
-  PencilIcon,
   CalendarBlank,
-  Eye,
   type IconWeight,
-  ImageIcon,
-  GraphIcon,
   ChartBarIcon,
-  NotePencilIcon
 } from 'phosphor-react-native';
-import { AppBottomNav } from '../components/AppBottomNav';
-import { AppHeader } from '../components/AppHeader';
-import { Avatar } from '../components/Avatar';
-import { Button } from '../components/Button';
-import { ListItem } from '../components/ListItem';
-import { SectionHeader } from '../components/SectionHeader';
-import { SurfaceCard } from '../components/SurfaceCard';
-import { Tag } from '../components/Tag';
-import { TileGrid } from '../components/TileGrid';
-import type { TileGridItem } from '../components/TileGrid';
-import { UpdateCard } from '../components/UpdateCard';
+import {
+  AppBottomNav,
+  AppHeader,
+  Avatar,
+  Banner,
+  Button,
+  ChipGroup,
+  IconButton,
+  ListItem,
+  ModalSheet,
+  SectionHeader,
+  SurfaceCard,
+  Tag,
+  TileGrid,
+} from '../components';
+import type { TileGridItem } from '../components';
 import { QuickActionsScreen } from './QuickActionsScreen';
 import { colors, iconSize, radius, spacing, typography } from '../tokens';
 import { mainNavItems } from './mainNav';
 import type { DailyHelpProfileVisitor, PrototypeScreenKey } from './types';
+import visitorRupa from '../assets/VisitorProfilePhotos/rupa.png';
+import visitorBhavna from '../assets/VisitorProfilePhotos/bhavna.png';
+import visitorRicha from '../assets/VisitorProfilePhotos/richa.png';
+import visitorRuchika from '../assets/VisitorProfilePhotos/ruchika.png';
+import visitorSwapnaja from '../assets/VisitorProfilePhotos/swapnaja.png';
+import visitorYamini from '../assets/VisitorProfilePhotos/yamini.png';
+import marketplaceCar from '../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png';
+import marketplaceFurniture from '../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png';
+import marketplaceKitchen from '../assets/MarketplaceITems/D532470A-D6BC-4023-BA67-2E4A7F5ED952.png';
+import { CreatePostCard, FeedCard, FeedEventActions } from '../patterns/feed';
+import { FlatSelectionSheet, HomeProfileButton, VisitorAvatarButton } from '../patterns/home';
 
 
 const quickActionsBase: TileGridItem[] = [
@@ -61,12 +67,12 @@ const quickActionsBase: TileGridItem[] = [
 ];
 
 const visitorImages = [
-  require('../assets/VisitorProfilePhotos/rupa.png'),
-  require('../assets/VisitorProfilePhotos/bhavna.png'),
-  require('../assets/VisitorProfilePhotos/richa.png'),
-  require('../assets/VisitorProfilePhotos/ruchika.png'),
-  require('../assets/VisitorProfilePhotos/swapnaja.png'),
-  require('../assets/VisitorProfilePhotos/yamini.png'),
+  visitorRupa,
+  visitorBhavna,
+  visitorRicha,
+  visitorRuchika,
+  visitorSwapnaja,
+  visitorYamini,
 ];
 
 const visitors = [
@@ -79,9 +85,9 @@ const visitors = [
 ];
 
 const marketplaceFeedImages = [
-  require('../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png'),
-  require('../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png'),
-  require('../assets/MarketplaceITems/D532470A-D6BC-4023-BA67-2E4A7F5ED952.png'),
+  marketplaceCar,
+  marketplaceFurniture,
+  marketplaceKitchen,
 ];
 
 const flatOptions = [
@@ -428,7 +434,7 @@ function getEffectiveScore(post: FeedPost) {
   return getFeedPriorityScore(post.priority) - (post.kind === 'event' ? 16 : 0);
 }
 
-function sortFeedPosts(posts: FeedPost[], tabKey: FeedTabKey | null) {
+function sortFeedPosts(posts: FeedPost[]) {
   const rankedPosts = [...posts];
 
   return rankedPosts.sort((a, b) => {
@@ -443,13 +449,13 @@ function sortFeedPosts(posts: FeedPost[], tabKey: FeedTabKey | null) {
 }
 
 function getFeedPostsForTab(posts: FeedPost[], tabKey: FeedTabKey | null) {
-  if (tabKey === null) return sortFeedPosts(posts, null);
-  if (tabKey === 'discussions') return sortFeedPosts(posts.filter(post => post.category === 'community' && post.kind !== 'poll' && post.kind !== 'event'), tabKey);
-  if (tabKey === 'notices') return sortFeedPosts(posts.filter(post => post.category === 'notice'), tabKey);
-  if (tabKey === 'localBuzz') return sortFeedPosts(posts.filter(post => post.category === 'localBuzz' && post.authorName === 'Local Buzz'), tabKey);
-  if (tabKey === 'polls') return sortFeedPosts(posts.filter(post => post.kind === 'poll'), tabKey);
-  if (tabKey === 'events') return sortFeedPosts(posts.filter(post => post.kind === 'event'), tabKey);
-  return sortFeedPosts(posts.filter(post => post.category === 'marketplace'), tabKey);
+  if (tabKey === null) return sortFeedPosts(posts);
+  if (tabKey === 'discussions') return sortFeedPosts(posts.filter(post => post.category === 'community' && post.kind !== 'poll' && post.kind !== 'event'));
+  if (tabKey === 'notices') return sortFeedPosts(posts.filter(post => post.category === 'notice'));
+  if (tabKey === 'localBuzz') return sortFeedPosts(posts.filter(post => post.category === 'localBuzz' && post.authorName === 'Local Buzz'));
+  if (tabKey === 'polls') return sortFeedPosts(posts.filter(post => post.kind === 'poll'));
+  if (tabKey === 'events') return sortFeedPosts(posts.filter(post => post.kind === 'event'));
+  return sortFeedPosts(posts.filter(post => post.category === 'marketplace'));
 }
 
 type TabIcon = ComponentType<{ size?: number; color?: string; weight?: IconWeight }>;
@@ -535,10 +541,7 @@ type Props = {
 };
 
 export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisitorCalendar }: Props) {
-  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<FeedTabKey | null>(null);
-  const filterScrollRef = useRef<ScrollViewType>(null);
-  const filterPillOffsets = useRef<Record<string, number>>({});
   const [activeNav, setActiveNav] = useState('social');
   const [firstFoldHeight, setFirstFoldHeight] = useState(0);
   const [showQuickActions, setShowQuickActions] = useState(false);
@@ -546,8 +549,6 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   const [isInSecondFold, setIsInSecondFold] = useState(false);
   const [preFeedSectionHeight, setPreFeedSectionHeight] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const flatSheetTranslateY = useRef(new Animated.Value(-320)).current;
-  const flatSheetOpacity = useRef(new Animated.Value(0)).current;
 
   // Wire quick actions into their destination experiences.
   const quickActions = quickActionsBase.map(action =>
@@ -575,43 +576,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   const visibleFeedPosts = getFeedPostsForTab(feedPosts, activeTab);
 
   const openFlatSwitcher = () => {
-    flatSheetTranslateY.setValue(-(insets.top + 280));
-    flatSheetOpacity.setValue(0);
     setShowFlatSwitcher(true);
-
-    requestAnimationFrame(() => {
-      Animated.parallel([
-        Animated.timing(flatSheetTranslateY, {
-          toValue: 0,
-          duration: 260,
-          useNativeDriver: true,
-        }),
-        Animated.timing(flatSheetOpacity, {
-          toValue: 1,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    });
-  };
-
-  const closeFlatSwitcher = () => {
-    Animated.parallel([
-      Animated.timing(flatSheetTranslateY, {
-        toValue: -(insets.top + 280),
-        duration: 220,
-        useNativeDriver: true,
-      }),
-      Animated.timing(flatSheetOpacity, {
-        toValue: 0,
-        duration: 160,
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
-      if (finished) {
-        setShowFlatSwitcher(false);
-      }
-    });
   };
 
   const smoothScroll = (targetY: number, onComplete?: () => void) => {
@@ -778,8 +743,6 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
     return <Avatar size="MD" type="Initials" name={post.authorName} />;
   };
 
-  const EVENT_BANNER_BG = '#092d35';
-
   const renderFeedEventContent = (post: FeedEventPost) => {
     const hasBody = Boolean(post.body);
 
@@ -837,35 +800,6 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
       </View>
     );
   };
-
-  const renderFeedEventActions = (post: FeedEventPost) => (
-    <>
-      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <Button kind="Tertiary" size="MD" label={String(post.attendeeCount)} showLeftIcon leftIcon={Users} />
-        <View style={{ flex: 1 }}>
-          <Button  kind="Tertiary" size="MD" label="Going?" fullWidth />
-        </View>
-      </View>
-      {/* <View style={{ height: 1, backgroundColor: colors.borderSubtle }} /> */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
-          <Pressable>
-            <ThumbsUp size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-          </Pressable>
-          <Pressable>
-            <ShareNetwork size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-          </Pressable>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <Eye size={iconSize.sm} color={colors.contentTertiary} weight="regular" />
-            <Text style={[typography.caption, { color: colors.contentTertiary }]}>{post.likeCount}</Text>
-          </View>
-          
-        </View>
-      </View>
-    </>
-  );
 
   const renderFeedMetaRow = (post: FeedPost) => {
     if (!post.trendingInCommunity) return null;
@@ -1014,51 +948,6 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
     );
   };
 
-  const renderCreatePostCard = () => (
-    <SurfaceCard elevated={false}>
-      <View style={{ gap: spacing.md }}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
-          <Avatar size="MD" type="Initials" name="Niraj P" />
-
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: spacing.md,
-              minHeight: 40,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              borderRadius: radius.md,
-              backgroundColor: colors.surfaceSecondary,
-              borderWidth: 0,
-              borderColor: colors.borderSubtle,
-            }}
-          >
-            <Text style={[typography.bodyLarge, { color: colors.contentPlaceholder, flex: 1 }]}>
-              What do you have to say?
-            </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
-              {[
-                { label: 'Photo', icon: ImageIcon },
-                { label: 'Poll', icon: ChartBarIcon },
-                { label: 'Event', icon: CalendarBlank },
-                { label: 'Sell', icon: TagIcon },
-              ].map(item => {
-                const ItemIcon = item.icon;
-                return (
-                  <View key={item.label}>
-                    <ItemIcon size={iconSize.lg} color={colors.contentAction} weight="regular" />
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-        </View>
-      </View>
-    </SurfaceCard>
-  );
-
   const firstFoldOpacity = scrollY.interpolate({
     inputRange: [0, Math.max(firstFoldHeight * 0.72, 1), Math.max(firstFoldHeight * 1.08, 1)],
     outputRange: [1, 0.55, 0],
@@ -1088,40 +977,13 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
         showShadow = {isInSecondFold}
         borderColor={colors.borderSubtle}
         leftSlot={
-          <Pressable onPress={openFlatSwitcher} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <Text style={typography.titleSubsection}>B 102</Text>
-            <CaretDown size={iconSize.sm} color={colors.contentPrimary} weight="bold" />
-          </Pressable>
+          <Button kind="Link" size="MD" label="B 102" showRightIcon rightIcon={CaretDown} onPress={openFlatSwitcher} />
         }
         rightSlot={
           <>
-            <Pressable onPress={() => onNavigate('searchExperience')} accessibilityRole="button" accessibilityLabel="Search MyGate">
-              <MagnifyingGlass size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-            </Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel="Notifications" style={{ position: 'relative' }}>
-              <Bell size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
-              <View
-                style={{
-                  position: 'absolute',
-                  top: -6,
-                  right: -6,
-                  minWidth: 16,
-                  height: 16,
-                  borderRadius: 99,
-                  backgroundColor: colors.contentNegative,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingHorizontal: 3,
-                  borderWidth: 1.5,
-                  borderColor: isInSecondFold ? colors.surfacePrimary : colors.surfacePage
-                }}
-              >
-                <Text style={[typography.caption, { color: colors.contentOnDark, fontSize: 9 }]}>7</Text>
-              </View>
-            </Pressable>
-            <Pressable onPress={() => onNavigate('settings')} accessibilityRole="button" accessibilityLabel="Open settings">
-              <Avatar size="SM" type="Initials" name="Niraj P" />
-            </Pressable>
+            <IconButton type="Ghost" size="MD" icon={MagnifyingGlass} accessibilityLabel="Search MyGate" onPress={() => onNavigate('searchExperience')} />
+            <IconButton type="Ghost" size="MD" icon={Bell} accessibilityLabel="Notifications" badgeCount={7} />
+            <HomeProfileButton onPress={() => onNavigate('settings')} />
           </>
         }
       />
@@ -1195,36 +1057,22 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
           <SurfaceCard elevated={false} >
             <SectionHeader
               title="Visitor Updates"
-              rightSlot={
-                <Pressable onPress={onOpenVisitorCalendar} style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                  <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>View All</Text>
-                  <CaretRight size={iconSize.sm} color={colors.contentAction} weight="bold" />
-                </Pressable>
-              }
+              actionLabel="View All"
+              onActionPress={onOpenVisitorCalendar}
             />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg }}>
               {visitors.map((v, i) => (
-                <Pressable
-                  key={i}
-                  disabled={!v.helpProfile}
-                  onPress={() => {
-                    if (v.helpProfile) onOpenDailyHelpProfile(v.helpProfile);
-                  }}
-                  style={{ width: '21%', alignItems: 'center', gap: spacing.xs }}
-                >
-                  <Avatar status="Online" size="XL" type="Image" source={v.source} />
-                  <Text numberOfLines={1} style={[typography.bodySmall, { color: colors.contentSecondary, textAlign: 'center' }]}>{v.name}</Text>
-                </Pressable>
+                <VisitorAvatarButton key={i} name={v.name} source={v.source} onPress={v.helpProfile ? () => onOpenDailyHelpProfile(v.helpProfile!) : undefined} />
               ))}
             </View>
           </SurfaceCard>
 
-          <UpdateCard
+          <Banner
             elevated={false}
             icon={Buildings}
             iconColor={colors.contentSecondary}
             title="Your society due is overdue"
-            subtitle="₹ 1289"
+            description="₹ 1289"
           />
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.xs, paddingTop: spacing.xl }}>
@@ -1234,94 +1082,32 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
         </View>
 
         <View style={{ gap: spacing.md, paddingHorizontal: spacing.md, paddingTop: spacing.md }}>
-          {renderCreatePostCard()}
+          <CreatePostCard />
         </View>
 
         <View style={{ backgroundColor: colors.surfacePage, paddingVertical: spacing.md }}>
-          <ScrollView ref={filterScrollRef} horizontal showsHorizontalScrollIndicator={false}>
-            <View style={{ flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md }}>
-              {feedTabItems.map(tab => {
-                const isActive = tab.key === activeTab;
-                const label = `${tab.label} (${tab.count})`;
-                return (
-                  <Pressable
-                    key={tab.key}
-                    onLayout={e => { filterPillOffsets.current[tab.key] = e.nativeEvent.layout.x; }}
-                    onPress={() => {
-                      const next = isActive ? null : tab.key;
-                      setActiveTab(next);
-                      scrollToFeedTop();
-                      if (next !== null) {
-                        const x = filterPillOffsets.current[next] ?? 0;
-                        filterScrollRef.current?.scrollTo({ x: Math.max(0, x - spacing.md), animated: true });
-                      }
-                    }}
-                    style={{
-                      paddingHorizontal: spacing.md,
-                      paddingVertical: spacing.sm,
-                      borderRadius: radius.pill,
-                      backgroundColor: isActive ? colors.surfaceActionSecondarySubtle : colors.surfacePrimary,
-                      borderWidth: 1,
-                      borderColor: isActive ? colors.borderAction : colors.borderDefault,
-                    }}
-                  >
-                    <Text style={[typography.bodyDefaultBold, { color: isActive ? colors.contentAction : colors.contentSecondary }]}>{label}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </ScrollView>
+          <View style={{ paddingHorizontal: spacing.md }}>
+            <ChipGroup layout="horizontal" value={activeTab} options={feedTabItems.map((tab) => ({ key: tab.key, label: `${tab.label} (${tab.count})` }))} onChange={(next) => { setActiveTab(typeof next === 'string' ? next as FeedTabKey : null); scrollToFeedTop(); }} />
+          </View>
         </View>
 
         <View style={{ gap: spacing.sm, paddingHorizontal: spacing.md, paddingBottom: spacing.xxl }}>
           {visibleFeedPosts.map(post => (
 
-            <SurfaceCard key={post.id} elevated={true} >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-                {renderFeedAuthorArtwork(post)}
-                <View style={{ flex: 1, gap: 2 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, flexWrap: 'wrap' }}>
-                    <Text style={typography.bodyDefaultBold}>{post.authorName}</Text>
-                    {post.authorRole === 'admin' ? (
-                      <Tag kind="Neutral" variant="Solid" label="Admin" />
-                    ) : null}
-                  </View>
-                  <Text style={[typography.caption, { color: colors.contentSecondary }]}>{getAuthorSubline(post)}</Text>
-                </View>
-                <DotsThreeVertical size={iconSize.md} color={colors.contentTertiary} weight="bold" />
-              </View>
-              <View style={{ gap: 4 }}>
-                {renderFeedMetaRow(post)}
-                {renderFeedContent(post)}
-              </View>
-              {post.category === 'notice' ? null : post.kind === 'listing' ? (
-                <View style={{ flexDirection: 'row', gap: spacing.sm, paddingTop:spacing.md }}>
-                  <View style={{ flex: 1 }}>
-                    <Button kind="Tertiary" size="MD" label="Share" fullWidth />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Button kind="Secondary" size="MD" label="Message" fullWidth />
-                  </View>
-                </View>
-              ) : post.kind === 'event' ? renderFeedEventActions(post) : (
-                <>
-                  <View style={{ height: 1, backgroundColor: colors.borderSubtle }} />
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
-                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                      <ThumbsUp size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-                      {post.likeCount > 0 && <Text style={[typography.bodySmall, { color: colors.contentPrimary }]}>{post.likeCount}</Text>}
-                    </Pressable>
-                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                      <ChatCircle size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-                      {post.replyCount > 0 && <Text style={[typography.bodySmall, { color: colors.contentPrimary }]}>{post.replyCount}</Text>}
-                    </Pressable>
-                    <Pressable>
-                      <ShareNetwork size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-                    </Pressable>
-                  </View>
-                </>
-              )}
-            </SurfaceCard>
+            <FeedCard
+              key={post.id}
+              authorArtwork={renderFeedAuthorArtwork(post)}
+              authorName={post.authorName}
+              admin={post.authorRole === 'admin'}
+              subline={getAuthorSubline(post)}
+              meta={renderFeedMetaRow(post)}
+              footer={post.category === 'notice' ? 'none' : post.kind === 'listing' ? 'listing' : 'standard'}
+              likeCount={post.likeCount}
+              replyCount={post.replyCount}
+              customFooter={post.kind === 'event' ? <FeedEventActions attendeeCount={post.attendeeCount} viewCount={post.likeCount} /> : undefined}
+            >
+              {renderFeedContent(post)}
+            </FeedCard>
           ))}
 
           {activeTab !== null && (() => {
@@ -1346,13 +1132,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
                   </SurfaceCard>
                 )}
 
-                <SurfaceCard elevated={true}>
-                  <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-                    <TabIcon size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-                    <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary, flex: 1 }]}>{meta.seeAllLabel}</Text>
-                    <CaretRight size={iconSize.sm} color={colors.contentTertiary} weight="bold" />
-                  </Pressable>
-                </SurfaceCard>
+                <ListItem artwork="Small" label={meta.seeAllLabel} leadingArtwork={<TabIcon size={iconSize.md} color={colors.contentSecondary} weight="regular" />} />
               </>
             );
           })()}
@@ -1377,108 +1157,15 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
       />
 
       {/* Quick Actions Modal */}
-      <Modal
-        visible={showQuickActions}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={() => setShowQuickActions(false)}
-      >
+      <ModalSheet visible={showQuickActions} presentation="full" onDismiss={() => setShowQuickActions(false)}>
         <QuickActionsScreen
           activeScreen="quickActions"
           onNavigate={onNavigate}
           onClose={() => setShowQuickActions(false)}
         />
-      </Modal>
+      </ModalSheet>
 
-      <Modal
-        visible={showFlatSwitcher}
-        animationType="none"
-        transparent
-        statusBarTranslucent
-        onRequestClose={closeFlatSwitcher}
-      >
-        <View style={{ flex: 1 }}>
-          <Animated.View
-            pointerEvents="none"
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              backgroundColor: 'rgba(2, 6, 23, 0.48)',
-              opacity: flatSheetOpacity,
-            }}
-          />
-          <Pressable style={{ flex: 1 }} onPress={closeFlatSwitcher}>
-            <Animated.View
-              style={{
-                transform: [{ translateY: flatSheetTranslateY }],
-                opacity: flatSheetOpacity,
-              }}
-            >
-              <Pressable onPress={(event) => event.stopPropagation()}>
-                <SurfaceCard
-                  style={{
-                    gap: 0,
-                    paddingTop: insets.top,
-                    paddingRight: 0,
-                    paddingBottom: spacing.sm,
-                    paddingLeft: 0,
-                    borderTopLeftRadius: 0,
-                    borderTopRightRadius: 0,
-                    borderBottomLeftRadius: radius.xxl,
-                    borderBottomRightRadius: radius.xxl,
-                    overflow:'hidden'
-                  }}
-                >
-                  <View
-                    style={{
-                      overflow: 'hidden',
-                      borderBottomLeftRadius: radius.xxl,
-                      borderBottomRightRadius: radius.xxl,
-                    }}
-                  >
-                    {flatOptions.map((flat, index) => (
-                      <ListItem
-                        key={flat.id}
-                        label={flat.flatLabel}
-                        paragraph={flat.societyLabel}
-                        size="Standard"
-                        artwork="Small"
-                        leadingArtwork={<House size={iconSize.lg} color={colors.contentPrimary} weight={flat.isActive ? "fill" : "regular"} />}
-                        labelStyle={flat.isActive ? typography.bodyLargeBold : typography.bodyLarge}
-                        controlElement={
-                          <View
-                            style={{
-                              minWidth: 20,
-                              height: 20,
-                              paddingHorizontal: spacing.xs,
-                              borderRadius: radius.pill,
-                              backgroundColor: flat.isActive ? colors.contentNegative : colors.contentNegative,
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <Text style={[typography.captionBold, { color: flat.isActive ? colors.contentOnDark : colors.contentOnDark }]}>
-                              {flat.badgeCount}
-                            </Text>
-                          </View>
-                        }
-                        divider={index < flatOptions.length - 0}
-                      />
-                    ))}
-                    <ListItem
-                      label="Add Flat/Villa / office"
-                      size="Standard"
-                      artwork="Small"
-                      leadingArtwork={<PlusCircle size={iconSize.lg} color={colors.contentAction} weight="regular" />}
-                      labelStyle={{ ...typography.bodyLargeBold, color: colors.contentAction }}
-                      controlElement={null}
-                    />
-                  </View>
-                </SurfaceCard>
-              </Pressable>
-            </Animated.View>
-          </Pressable>
-        </View>
-      </Modal>
+      <FlatSelectionSheet visible={showFlatSwitcher} flats={flatOptions} onDismiss={() => setShowFlatSwitcher(false)} />
 
     </View>
   );

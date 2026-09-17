@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+import type { TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ArrowClockwise,
@@ -10,7 +11,6 @@ import {
   ChatsCircle,
   ClockCounterClockwise,
   House,
-  MagnifyingGlass,
   Package,
   ShieldCheck,
   Sparkle,
@@ -18,9 +18,9 @@ import {
   User,
   Users,
   Wrench,
-  X
 } from 'phosphor-react-native';
-import { appHeaderHeight, colors, iconSize, radius, spacing, typography } from '../tokens';
+import { Button, Chip, ChipGroup, IconButton, IconTile, ListItem, SearchField } from '../components';
+import { appHeaderHeight, colors, iconSize, primitiveColors, radius, spacing, typography } from '../tokens';
 import type { DailyHelpProfileVisitor, PrototypeScreenKey } from './types';
 
 type Props = {
@@ -32,6 +32,15 @@ type Props = {
 
 type SearchScope = 'all' | 'residents' | 'visitors' | 'dailyHelp' | 'listings' | 'services' | 'posts';
 type SearchKind = Exclude<SearchScope, 'all'>;
+
+const searchKindColorByKind: Record<SearchKind, string> = {
+  residents: colors.contentPositive,
+  visitors: colors.contentWarning,
+  dailyHelp: colors.contentAction,
+  listings: primitiveColors['Color/support/purple/400'],
+  services: primitiveColors['Color/brand/core/clear-blue/400'],
+  posts: colors.contentSecondary
+};
 
 type SearchItem = {
   id: string;
@@ -91,7 +100,7 @@ const searchItems: SearchItem[] = [
     meta: 'Resident directory',
     keywords: ['ravi', 'sharma', 'b 204', 'tower b', 'resident'],
     sectionLabel: 'Residents',
-    accent: '#0F9D8A',
+    accent: searchKindColorByKind.residents,
     verified: true,
     inSociety: true,
     owners: true,
@@ -105,7 +114,7 @@ const searchItems: SearchItem[] = [
     meta: 'Resident directory',
     keywords: ['meera', 'venkat', 'd 401', 'tower d', 'resident'],
     sectionLabel: 'Residents',
-    accent: '#0F9D8A',
+    accent: searchKindColorByKind.residents,
     verified: true,
     inSociety: true,
     owners: false
@@ -118,7 +127,7 @@ const searchItems: SearchItem[] = [
     meta: 'Visitor log',
     keywords: ['amazon', 'delivery', 'gate 2', 'package', 'visitor'],
     sectionLabel: 'Visitors',
-    accent: '#E39A16',
+    accent: searchKindColorByKind.visitors,
     approved: true,
     deliveries: true,
     recent: true
@@ -131,7 +140,7 @@ const searchItems: SearchItem[] = [
     meta: 'Visitor log',
     keywords: ['ola', 'cab', 'pickup', 'visitor'],
     sectionLabel: 'Visitors',
-    accent: '#E39A16',
+    accent: searchKindColorByKind.visitors,
     approved: true,
     recent: true
   },
@@ -143,7 +152,7 @@ const searchItems: SearchItem[] = [
     meta: 'Checked in at 8:30 AM',
     keywords: ['gateimma', 'cook', 'b 102', 'daily help'],
     sectionLabel: 'Daily Help',
-    accent: '#2D7FF9',
+    accent: searchKindColorByKind.dailyHelp,
     verified: true,
     checkedIn: true,
     availableNow: true,
@@ -162,7 +171,7 @@ const searchItems: SearchItem[] = [
     meta: 'Available after 2 PM',
     keywords: ['rupa', 'housekeeping', 'a 804', 'daily help'],
     sectionLabel: 'Daily Help',
-    accent: '#2D7FF9',
+    accent: searchKindColorByKind.dailyHelp,
     verified: true,
     availableNow: false,
     checkedIn: false
@@ -175,7 +184,7 @@ const searchItems: SearchItem[] = [
     meta: 'Used listing',
     keywords: ['sofa', '3 seater', 'tower b', 'listing', 'furniture'],
     sectionLabel: 'Listings',
-    accent: '#D15593',
+    accent: searchKindColorByKind.listings,
     inSociety: true,
     verified: true,
     under10k: false,
@@ -189,7 +198,7 @@ const searchItems: SearchItem[] = [
     meta: 'Used listing',
     keywords: ['cycle', 'kids cycle', 'listing', 'tower c'],
     sectionLabel: 'Listings',
-    accent: '#D15593',
+    accent: searchKindColorByKind.listings,
     inSociety: true,
     verified: true,
     under10k: true,
@@ -203,7 +212,7 @@ const searchItems: SearchItem[] = [
     meta: 'Home services',
     keywords: ['plumber', 'plumbing', 'ramesh', 'leak', 'service'],
     sectionLabel: 'Services',
-    accent: '#6C55F5',
+    accent: searchKindColorByKind.services,
     topRated: true,
     availableNow: true,
     homeVisit: true
@@ -216,7 +225,7 @@ const searchItems: SearchItem[] = [
     meta: 'Community services',
     keywords: ['tutor', 'math', 'cbse', 'classes', 'service'],
     sectionLabel: 'Services',
-    accent: '#6C55F5',
+    accent: searchKindColorByKind.services,
     topRated: false,
     availableNow: true,
     homeVisit: false
@@ -229,7 +238,7 @@ const searchItems: SearchItem[] = [
     meta: '14 replies · trending',
     keywords: ['parking', 'visitor slots', 'discussion', 'post'],
     sectionLabel: 'Posts',
-    accent: '#475467',
+    accent: searchKindColorByKind.posts,
     trending: true,
     recent: true
   },
@@ -241,7 +250,7 @@ const searchItems: SearchItem[] = [
     meta: 'Notice board',
     keywords: ['lift', 'audit', 'notice', 'society post'],
     sectionLabel: 'Posts',
-    accent: '#475467',
+    accent: searchKindColorByKind.posts,
     notices: true,
     recent: true
   }
@@ -292,65 +301,13 @@ function SearchInput({
   onClear: () => void;
   inputRef: React.RefObject<TextInput | null>;
 }) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.sm,
-        borderRadius: radius.xl,
-        borderWidth: 1,
-        borderColor: colors.borderSubtle,
-        backgroundColor: colors.surfaceSecondary,
-        paddingHorizontal: spacing.md,
-        minHeight: 56
-      }}
-    >
-      <MagnifyingGlass size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-      <TextInput
-        ref={inputRef}
-        value={value}
-        onChangeText={onChangeText}
-        autoFocus
-        placeholder="Search residents, help, visitors, listings..."
-        placeholderTextColor={colors.contentTertiary}
-        style={[typography.bodyDefault, { flex: 1, color: colors.contentPrimary }]}
-      />
-      {value ? (
-        <Pressable onPress={onClear} hitSlop={10}>
-          <X size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-        </Pressable>
-      ) : null}
-    </View>
-  );
+  return <SearchField value={value} onChangeText={onChangeText} onClear={onClear} inputRef={inputRef} autoFocus placeholder="Search residents, help, visitors, listings..." />;
 }
 
 function ScopeTabs({ activeScope, onSelect }: { activeScope: SearchScope; onSelect: (scope: SearchScope) => void }) {
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-      {scopeOrder.map((scope) => {
-        const isActive = scope.key === activeScope;
-        return (
-          <Pressable
-            key={scope.key}
-            onPress={() => onSelect(scope.key)}
-            style={{
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              borderRadius: radius.pill,
-              borderWidth: isActive ? 2 : 1,
-              borderColor: isActive ? colors.contentAction : colors.borderSubtle,
-              backgroundColor: isActive ? colors.surfacePrimary : colors.surfaceSecondary
-            }}
-          >
-            <Text style={[typography.bodySmallBold, { color: isActive ? colors.contentAction : colors.contentPrimary }]}>
-              {scope.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
-  );
+  return <ChipGroup layout="horizontal" value={activeScope} options={scopeOrder} onChange={(value) => {
+    if (typeof value === 'string') onSelect(value as SearchScope);
+  }} />;
 }
 
 function ResultRow({
@@ -361,42 +318,16 @@ function ResultRow({
   onPress?: () => void;
 }) {
   const Icon = getIconForKind(item.kind);
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.md,
-        paddingVertical: spacing.md
-      }}
-    >
-      <View
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: radius.lg,
-          backgroundColor: `${item.accent}18`,
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <Icon size={iconSize.md} color={item.accent} weight="regular" />
-      </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-          <Text style={typography.bodyDefaultBold}>{item.title}</Text>
-          {item.verified ? <ShieldCheck size={iconSize.sm} color={colors.contentAction} weight="fill" /> : null}
-        </View>
-        <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>{item.subtitle}</Text>
-        <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>{item.meta}</Text>
-      </View>
-      <View style={{ alignItems: 'flex-end', gap: 4 }}>
-        {item.priceLabel ? <Text style={typography.bodyDefaultBold}>{item.priceLabel}</Text> : null}
-        <CaretRight size={iconSize.sm} color={colors.contentTertiary} weight="bold" />
-      </View>
-    </Pressable>
-  );
+  return <ListItem
+    artwork="Small"
+    onPress={onPress}
+    accessibilityLabel={item.title}
+    leadingArtwork={<IconTile icon={Icon} iconColor={item.accent} iconSize={iconSize.md} tileSize={44} />}
+    titleContent={<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}><Text style={typography.bodyDefaultBold}>{item.title}</Text>{item.verified ? <ShieldCheck size={iconSize.sm} color={colors.contentAction} weight="fill" /> : null}</View>}
+    subtitleContent={<Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>{item.subtitle}</Text>}
+    metadataContent={<Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>{item.meta}</Text>}
+    trailingContent={<View style={{ alignItems: 'flex-end', gap: spacing.xs }}>{item.priceLabel ? <Text style={typography.bodyDefaultBold}>{item.priceLabel}</Text> : null}<CaretRight size={iconSize.sm} color={colors.contentTertiary} weight="bold" /></View>}
+  />;
 }
 
 function HairlineSection({ children }: { children: React.ReactNode }) {
@@ -484,9 +415,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
           }}
         >
           <View style={{ minHeight: appHeaderHeight, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10}>
-              <ArrowLeft size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-            </Pressable>
+            <IconButton type="Ghost" size="MD" icon={ArrowLeft} accessibilityLabel="Go back" onPress={onBack} />
             <View style={{ flex: 1 }}>
               <SearchInput value={query} onChangeText={setQuery} onClear={() => setQuery('')} inputRef={inputRef} />
             </View>
@@ -505,22 +434,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
               <HairlineSection>
                 <View style={{ gap: spacing.sm }}>
                   {recentSearches.map((item) => (
-                    <Pressable
-                      key={item}
-                      onPress={() => handleSelectSuggestion(item)}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingVertical: spacing.sm
-                      }}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                        <ClockCounterClockwise size={iconSize.md} color={colors.contentSecondary} weight="regular" />
-                        <Text style={typography.bodyDefault}>{item}</Text>
-                      </View>
-                      <CaretRight size={iconSize.sm} color={colors.contentTertiary} weight="bold" />
-                    </Pressable>
+                    <ListItem key={item} size="Compact" artwork="Small" label={item} leadingArtwork={<ClockCounterClockwise size={iconSize.md} color={colors.contentSecondary} weight="regular" />} onPress={() => handleSelectSuggestion(item)} />
                   ))}
                 </View>
               </HairlineSection>
@@ -536,20 +450,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
               >
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
                   {quickIdeas.map((idea) => (
-                    <Pressable
-                      key={idea.label}
-                      onPress={() => handleSelectSuggestion(idea.query, idea.scope)}
-                      style={{
-                        paddingHorizontal: spacing.md,
-                        paddingVertical: spacing.sm,
-                        borderRadius: radius.pill,
-                        borderWidth: 1,
-                        borderColor: colors.borderSubtle,
-                        backgroundColor: colors.surfacePrimary
-                      }}
-                    >
-                      <Text style={typography.bodySmallBold}>{idea.label}</Text>
-                    </Pressable>
+                    <Chip key={idea.label} label={idea.label} showLeadingIcon={false} showTrailingIcon={false} onPress={() => handleSelectSuggestion(idea.query, idea.scope)} />
                   ))}
                 </View>
               </View>
@@ -571,36 +472,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
                                 ? Storefront
                                 : ChatsCircle;
                     return (
-                      <Pressable
-                        key={scope.key}
-                        onPress={() => setActiveScope(scope.key)}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: spacing.md,
-                          paddingVertical: spacing.md
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: radius.lg,
-                            backgroundColor: colors.surfaceSecondary,
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <Icon size={iconSize.md} color={colors.contentPrimary} weight="regular" />
-                        </View>
-                        <View style={{ flex: 1, gap: 2 }}>
-                          <Text style={typography.bodyDefaultBold}>{scope.label}</Text>
-                          <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>
-                            {getScopeDescription(scope.key)}
-                          </Text>
-                        </View>
-                        <CaretRight size={iconSize.sm} color={colors.contentTertiary} weight="bold" />
-                      </Pressable>
+                      <ListItem key={scope.key} artwork="Small" label={scope.label} paragraph={getScopeDescription(scope.key)} leadingArtwork={<Icon size={iconSize.md} color={colors.contentPrimary} weight="regular" />} onPress={() => setActiveScope(scope.key)} />
                     );
                   })}
               </HairlineSection>
@@ -611,22 +483,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
                 <HairlineSection>
                   <View style={{ gap: spacing.sm }}>
                     {suggestions.map((item) => (
-                      <Pressable
-                        key={item.id}
-                        onPress={() => handleSelectSuggestion(item.title, item.kind)}
-                      style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          paddingVertical: spacing.sm
-                        }}
-                      >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                          <Sparkle size={iconSize.sm} color={colors.contentAction} weight="fill" />
-                          <Text style={typography.bodyDefault}>{item.title}</Text>
-                        </View>
-                        <Text style={[typography.bodySmallBold, { color: colors.contentSecondary }]}>{item.sectionLabel}</Text>
-                      </Pressable>
+                      <ListItem key={item.id} size="Compact" artwork="Small" label={item.title} leadingArtwork={<Sparkle size={iconSize.sm} color={colors.contentAction} weight="fill" />} trailingContent={<Text style={[typography.bodySmallBold, { color: colors.contentSecondary }]}>{item.sectionLabel}</Text>} onPress={() => handleSelectSuggestion(item.title, item.kind)} />
                     ))}
                   </View>
                 </HairlineSection>
@@ -651,14 +508,7 @@ export function SearchExperienceScreen({ onBack, onOpenDailyHelpProfile }: Props
                       Try a broader scope, a shorter query, or one of these common searches.
                     </Text>
                     {['Gateimma', 'Ravi Sharma', 'plumber', 'delivery', 'sofa'].map((item) => (
-                      <Pressable
-                        key={item}
-                        onPress={() => handleSelectSuggestion(item, 'all')}
-                        style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
-                      >
-                        <ArrowClockwise size={iconSize.sm} color={colors.contentAction} weight="regular" />
-                        <Text style={[typography.bodyDefaultBold, { color: colors.contentAction }]}>{item}</Text>
-                      </Pressable>
+                      <Button key={item} kind="Link" size="SM" label={item} showLeftIcon leftIcon={ArrowClockwise} onPress={() => handleSelectSuggestion(item, 'all')} />
                     ))}
                   </View>
                 </View>
