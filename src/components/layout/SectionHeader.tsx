@@ -18,6 +18,8 @@ type SectionHeaderProps = {
   rightSlot?: ReactNode;
   /** Makes the title pressable and appends a caret */
   onPress?: () => void;
+  /** Aligns header content with the inset content inside adjacent cards. */
+  inset?: boolean;
 };
 
 export function SectionHeader({
@@ -28,7 +30,8 @@ export function SectionHeader({
   actionIcon: ActionIcon = CaretRight,
   onActionPress,
   rightSlot,
-  onPress
+  onPress,
+  inset = false,
 }: SectionHeaderProps) {
   const actionContent = actionLabel ? (
     <>
@@ -67,7 +70,7 @@ export function SectionHeader({
   );
 
   return (
-    <View style={{ gap: 2 }}>
+    <View style={{ gap: 2, paddingHorizontal: inset ? spacing.lg : 0 }}>
       {onPress ? (
         <Pressable onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
           {titleRow}

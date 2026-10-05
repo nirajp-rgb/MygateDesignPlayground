@@ -38,4 +38,6 @@
 - Domain language appears only in patterns, not generic primitives.
 - Light and dark modes remain legible.
 - Existing compatibility props are retained or migrated without breaking callers.
+- Page and overlay presentation follows `PAGE_PRESENTATION_AND_MOTION_GUIDELINES.md`.
+- Custom motion has a clear purpose, remains interruptible, and includes a Reduce Motion alternative.
 - `npm run validate` passes from a clean install.

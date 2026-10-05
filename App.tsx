@@ -3,10 +3,11 @@ import { Archivo_400Regular, Archivo_600SemiBold, useFonts } from '@expo-google-
 import { StatusBar } from 'expo-status-bar';
 import type { Mode } from './src/tokens/color';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { HomeScreen, TemplateScreen, SettingsScreen, DailyHelpProfileScreen, AppHomeScreen, MarketplaceScreen, QuickActionsScreen, ListingWizardScreen, SearchExperienceScreen, FaceCaptureScreen, VisitorCalendarScreen, FamilyScreen, type PrototypeScreenKey } from './src/screens';
+import { HomeScreen, TemplateScreen, DailyHelpProfileScreen, AppHomeScreen, MarketplaceScreen, QuickActionsScreen, ListingWizardScreen, SearchExperienceScreen, FaceCaptureScreen, VisitorCalendarScreen, FamilyScreen, type PrototypeScreenKey } from './src/screens';
 import type { DailyHelpProfileVisitor } from './src/screens/types';
 import type { ImageSourcePropType } from 'react-native';
 import { currentMode, getStatusBarStyle, setUIMode } from './src/tokens';
+import { SettingsNavigator } from './src/navigation';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -44,7 +45,7 @@ export default function App() {
       {activeScreen === 'home' ? (
         <HomeScreen key={`home-${themeMode}`} activeScreen={activeScreen} onNavigate={navigateTo} />
       ) : activeScreen === 'settings' ? (
-        <SettingsScreen
+        <SettingsNavigator
           key={`settings-${themeMode}`}
           onBack={() => setActiveScreen(previousScreen)}
           themeMode={themeMode}

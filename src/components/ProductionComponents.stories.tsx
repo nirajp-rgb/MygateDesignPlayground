@@ -110,7 +110,15 @@ export const TagStory: Story = {
 };
 
 export const NumberBadgeStory: Story = { name: 'NumberBadge', args: { count: 7 }, render: (args) => <NumberBadge {...args} count={Number(args.count)} /> };
-export const IconTileStory: Story = { name: 'IconTile', args: { iconSize: 24, tileSize: 48 }, render: (args) => <IconTile {...args} icon={Bell} iconSize={Number(args.iconSize)} iconColor={colors.contentAction} /> };
+export const IconTileStory: Story = {
+  name: 'IconTile',
+  args: { size: 'MD', tone: 'Action' },
+  argTypes: {
+    size: select(['SM', 'MD', 'LG']),
+    tone: select(['Neutral', 'Action', 'Info', 'Positive', 'Warning', 'Negative']),
+  },
+  render: (args) => <IconTile {...args} icon={Bell} />,
+};
 
 export const ListItemStory: Story = {
   name: 'ListItem',
@@ -119,6 +127,7 @@ export const ListItemStory: Story = {
     artwork: 'Small',
     layout: 'Simple',
     label: 'Visitor pre-approved',
+    titleWeight: 'regular',
     paragraph: 'Expected today at 6:30 PM',
     trailingLabel: 'Today',
     trailingParagraph: '6:30 PM',
@@ -126,26 +135,57 @@ export const ListItemStory: Story = {
     thirdLine: false,
     divider: false,
     iconBacking: false,
+    artworkTone: 'Action',
+    artworkSize: 'SM',
   },
   argTypes: {
-    size: select(['Standard', 'Compact']),
+    size: select(['Large', 'Standard', 'Compact']),
     artwork: select(['None', 'Small']),
+    artworkTone: select(['Neutral', 'Action', 'Info', 'Positive', 'Warning', 'Negative']),
+    artworkSize: select(['SM', 'MD', 'LG']),
     layout: select(['Simple', 'Label trailing']),
+    titleWeight: select(['regular', 'bold']),
     onPress: action,
   },
   render: (args) => (
     <View style={{ width: '100%', minWidth: 320 }}>
       <ListItem
         {...args}
-        leadingArtwork={<House size={24} color={colors.contentAction} />}
+        artworkIcon={House}
       />
+    </View>
+  ),
+};
+
+export const ComposableListItemStory: Story = {
+  name: 'ListItem / composable slots',
+  args: { size: 'Standard', surface: 'transparent' },
+  argTypes: {
+    size: select(['Large', 'Standard', 'Compact']),
+    surface: select(['primary', 'transparent']),
+  },
+  render: (args) => (
+    <View style={{ width: '100%', minWidth: 320 }}>
+      <SurfaceCard accent style={{ padding: 0, overflow: 'hidden' }}>
+        <ListItem
+          {...args}
+          label="Notification diagnostics"
+          leftSlot={
+            <View style={{ gap: 2 }}>
+              <Text style={typography.bodyDefaultBold}>Not getting notifications?</Text>
+              <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>Send a test notification</Text>
+            </View>
+          }
+          rightSlot={<Button kind="Tertiary" size="SM" label="Test now" />}
+        />
+      </SurfaceCard>
     </View>
   ),
 };
 
 export const TileStory: Story = {
   name: 'Tile', args: { label: 'Home services', sublabel: '12 services', artworkType: 'icon', size: 'MD', variant: 'standard', contentAlign: 'center', selected: false, disabled: false },
-  argTypes: { artworkType: select(['icon', 'image', 'none']), size: select(['SM', 'MD']), variant: select(['standard', 'card']), contentAlign: select(['center', 'left']), onPress: action }, render: (args) => <View style={{ width: 180 }}><Tile {...args} label={String(args.label)} icon={House} /></View>,
+  argTypes: { artworkType: select(['icon', 'image', 'none']), size: select(['SM', 'MD']), variant: select(['standard', 'card', 'horizontal']), contentAlign: select(['center', 'left']), onPress: action }, render: (args) => <View style={{ width: 180 }}><Tile {...args} label={String(args.label)} icon={House} /></View>,
 };
 
 export const TileGroupStory: Story = {
@@ -154,7 +194,7 @@ export const TileGroupStory: Story = {
 };
 
 export const SurfaceCardStory: Story = { name: 'SurfaceCard', args: { accent: false, elevated: false, borderWidth: 0.5 }, render: (args) => <SurfaceCard {...args}><Text style={[typography.bodyDefault, { color: colors.contentPrimary }]}>Card content</Text></SurfaceCard> };
-export const SectionHeaderStory: Story = { name: 'SectionHeader', args: { title: 'Recent activity', subtitle: 'The latest updates', actionLabel: 'View all' }, argTypes: { onActionPress: action }, render: (args) => <View style={{ minWidth: 320 }}><SectionHeader {...args} title={String(args.title)} leadingIcon={Bell} /></View> };
+export const SectionHeaderStory: Story = { name: 'SectionHeader', args: { title: 'Recent activity', subtitle: 'The latest updates', actionLabel: 'View all', inset: false }, argTypes: { onActionPress: action }, render: (args) => <View style={{ minWidth: 320 }}><SectionHeader {...args} title={String(args.title)} leadingIcon={Bell} /></View> };
 export const ListGroupStory: Story = { name: 'ListGroup', render: () => <View style={{ minWidth: 320 }}><ListGroup><ListItem label="First item" paragraph="Grouped row content" /><ListItem label="Second item" paragraph="Shared list container" /></ListGroup></View> };
 export const TileGridStory: Story = { name: 'TileGrid', args: { columns: 2, gap: spacing.sm }, render: (args) => <View style={{ minWidth: 320 }}><TileGrid {...args} items={[{ key: 'home', label: 'Home', artworkType: 'icon', icon: House }, { key: 'people', label: 'Residents', artworkType: 'icon', icon: User }]} /></View> };
 export const ActionFooterStory: Story = {

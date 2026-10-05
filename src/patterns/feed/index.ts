@@ -1,2 +1,3 @@
 export { CreatePostCard, FeedCard, FeedEventActions } from './FeedCards';
 export type { FeedCardProps } from './FeedCards';
+export { FeedActionsSheet } from './FeedActionsSheet';

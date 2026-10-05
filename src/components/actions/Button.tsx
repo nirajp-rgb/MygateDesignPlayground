@@ -4,7 +4,7 @@ import { Pressable, Text } from 'react-native';
 import type { IconProps } from 'phosphor-react-native';
 import { colors, iconSize, radius, spacing, typography } from '../../tokens';
 
-export type ButtonKind = 'Primary' | 'Secondary' | 'Tertiary' | 'Inline' | 'Link' | 'Positive';
+export type ButtonKind = 'Primary' | 'Secondary' | 'Tertiary' | 'Inline' | 'Link' | 'Positive' | 'Warning' | 'Critical';
 export type ButtonState = 'Default' | 'Pressed' | 'Disabled';
 export type ButtonSize = 'SM' | 'MD' | 'LG';
 
@@ -70,7 +70,7 @@ function getPalette(kind: ButtonKind, isDisabled: boolean): Palette {
       return {
         backgroundColor: colors.surfaceActionPrimary,
         borderColor: 'transparent',
-        textColor: colors.contentPrimary,
+        textColor: colors.contentOnLight,
         hasBorder: false,
         underline: false,
       };
@@ -112,6 +112,22 @@ function getPalette(kind: ButtonKind, isDisabled: boolean): Palette {
         borderColor: 'transparent',
         textColor: colors.contentOnDark,
         hasBorder: false,
+        underline: false,
+      };
+      case 'Warning':
+      return {
+        backgroundColor: colors.surfaceWarningBold,
+        borderColor: 'transparent',
+        textColor: colors.contentOnDark,
+        hasBorder: false,
+        underline: false,
+      };
+      case 'Critical':
+      return {
+        backgroundColor: colors.surfacePrimary,
+        borderColor: colors.borderNegative,
+        textColor: colors.contentNegative,
+        hasBorder: true,
         underline: false,
       };
   }

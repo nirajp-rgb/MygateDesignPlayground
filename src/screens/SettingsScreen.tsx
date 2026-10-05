@@ -32,7 +32,6 @@ import {
   SurfaceCard,
   Switch,
   Tag,
-  TileGrid,
 } from '../components';
 import { appPagePaddingBottom, colors, iconSize, spacing, typography } from '../tokens';
 import type { Mode } from '../tokens/color';
@@ -47,12 +46,13 @@ type HouseholdTile = {
 };
 
 const householdTiles: HouseholdTile[] = [
-  { icon: House, label: 'Urban Company', subtext: 'Subtext' },
+  
   { icon: UsersThree, label: 'Family', subtext: '2 members' },
   { icon: UserList, label: 'Daily Help', subtext: 'Manjunath +2' },
   { icon: Car, label: 'Vehicles', subtext: 'DL9C744g +1' },
   { icon: PawPrint, label: 'Pets', subtext: 'Subtext' },
   { icon: House, label: 'Early approvals', subtext: 'Subtext' },
+  { icon: House, label: 'Urban Company', subtext: 'Subtext' },
 ];
 
 type Flat = {
@@ -73,9 +73,10 @@ type SettingsScreenProps = {
   profilePhotoSource?: ImageSourcePropType;
   onOpenFaceCapture: () => void;
   onOpenFamily: () => void;
+  onOpenNotificationSettings: () => void;
 };
 
-export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoSource, onOpenFaceCapture, onOpenFamily }: SettingsScreenProps) {
+export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoSource, onOpenFaceCapture, onOpenFamily, onOpenNotificationSettings }: SettingsScreenProps) {
   const [flashApprovalsEnabled, setFlashApprovalsEnabled] = useState(false);
   return (
     <View style={{ flex: 1, backgroundColor: colors.surfacePageStrong, paddingBottom: appPagePaddingBottom }}>
@@ -99,7 +100,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xl ,paddingVertical:spacing.lg,paddingHorizontal:spacing.lg}}>
             <View>
               <ProfilePhotoButton source={profilePhotoSource} name="Niraj Pangarkar" onPress={onOpenFaceCapture} />
-              <View style={{ marginTop: -spacing.xl, alignSelf: 'center' }}><IconButton type="Tertiary" size="SM" icon={QrCode} accessibilityLabel="Show QR code" /></View>
+              <View style={{ marginTop: -spacing.xl, alignSelf: 'center' }}><IconButton type="Tertiary" size="MD" icon={QrCode} accessibilityLabel="Show QR code" /></View>
             </View>
 
             <View style={{ flex: 1, gap: spacing.sm }}>
@@ -132,14 +133,50 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
         </SurfaceCard>
 
         {/* ── Household ──────────────────────────────────────── */}
-        <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="Household" actionLabel="Manage" />
-          <TileGrid columns={3} gap={spacing.sm} items={householdTiles.map((tile) => ({ key: tile.label, label: tile.label, sublabel: tile.subtext, artworkType: 'icon', icon: tile.icon, variant: 'card', contentAlign: 'left', onPress: tile.label === 'Family' ? onOpenFamily : undefined }))} />
+        <View style={{ gap: spacing.md }}>
+          <SectionHeader title="Household" actionLabel="Manage" inset />
+          <View style={{ gap: spacing.sm }}>
+            {[0, 2, 4].map((startIndex) => (
+              <View key={startIndex} style={{ flexDirection: 'row', gap: spacing.sm }}>
+                {householdTiles.slice(startIndex, startIndex + 2).map((tile) => {
+                  const TileIcon = tile.icon;
+                  return (
+                    <SurfaceCard
+                      key={tile.label}
+                      borderWidth={0}
+                      style={{ flex: 1, padding: 0, overflow: 'hidden', paddingVertical: spacing.xs }}
+                    >
+                      <ListItem
+                        label={tile.label}
+                        size="Compact"
+                        surface="transparent"
+                        onPress={tile.label === 'Family' ? onOpenFamily : undefined}
+                        leftSlot={
+                          <View style={{ gap: 2 }}>
+                            <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary }]}>
+                              {tile.label}
+                            </Text>
+                            <Text style={[typography.bodySmall, { color: colors.contentTertiary }]}>
+                              {tile.subtext}
+                            </Text>
+                          </View>
+                        }
+                        rightSlot={
+                          <TileIcon size={iconSize.lg} color={colors.contentSecondary} weight="regular" />
+                        }
+                      />
+                    </SurfaceCard>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* ── Security & Notifications ───────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="Security & Notifications" />
+
+          <SectionHeader title="Security & Notifications" inset />
           <View style={{ gap: spacing.sm }}>
           <ListGroup>
             <ListItem
@@ -147,6 +184,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
               size="Standard"
               artwork="Small"
               leadingArtwork={<Bell size={iconSize.md} color={colors.contentSecondary} weight="regular" />}
+              onPress={onOpenNotificationSettings}
               divider
             />
             <ListItem
@@ -158,41 +196,51 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
           </ListGroup>
 
           {/* Flash Approvals */}
-          <SurfaceCard borderWidth={0}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={typography.bodyDefaultBold}>Flash Approvals</Text>
-              <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>
-                Never miss approvals again.{' '}
-                <Text style={[typography.bodySmallBold, { color: colors.contentPrimary, textDecorationLine: 'underline' }]}>
-                  Learn more
-                </Text>
-              </Text>
-            </View>
-            <Switch value={flashApprovalsEnabled ? 'on' : 'off'} onPress={() => setFlashApprovalsEnabled((enabled) => !enabled)} />
-            </View>
+          <SurfaceCard borderWidth={0} style={{ padding: 0, overflow: 'hidden' }}>
+            <ListItem
+              label="Flash Approvals"
+              surface="transparent"
+              leftSlot={
+                <View style={{ gap: 2 }}>
+                  <Text style={typography.bodyDefaultBold}>Flash Approvals</Text>
+                  <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>
+                    Never miss approvals again.{' '}
+                    <Text style={[typography.bodySmallBold, { color: colors.contentPrimary, textDecorationLine: 'underline' }]}>
+                      Learn more
+                    </Text>
+                  </Text>
+                </View>
+              }
+              rightSlot={
+                <Switch value={flashApprovalsEnabled ? 'on' : 'off'} onPress={() => setFlashApprovalsEnabled((enabled) => !enabled)} />
+              }
+            />
           </SurfaceCard>
 
           {/* Not Getting Notifications */}
-          <SurfaceCard accent borderWidth={1}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary }]}>
-                Not Getting Notifications?
-              </Text>
-              <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>
-                Try sending a test notification
-              </Text>
-            </View>
-            <Button kind="Tertiary" size="SM" label="Test now" />
-            </View>
+          <SurfaceCard  borderWidth={0} style={{ padding: 0, overflow: 'hidden', backgroundColor: colors.surfaceWarningSubtle }}>
+            <ListItem
+              label="Not Getting Notifications?"
+              surface="transparent"
+              leftSlot={
+                <View style={{ gap: 2 }}>
+                  <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary }]}>
+                    Not Getting Notifications?
+                  </Text>
+                  <Text style={[typography.bodySmall, { color: colors.contentSecondary }]}>
+                    Try sending a test notification
+                  </Text>
+                </View>
+              }
+              rightSlot={<Button kind="Warning" size="SM" label="Test now" />}
+            />
           </SurfaceCard>
           </View>
         </View>
 
         {/* ── Manage Flats ───────────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="Manage Flats" />
+          <SectionHeader title="Manage Flats" inset />
           <ListGroup>
           {flats.map((flat, i) => (
             <ListItem
@@ -229,7 +277,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
 
         {/* ── Purchases ──────────────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="Purchases" />
+          <SectionHeader title="Purchases" inset />
           <ListGroup>
           <ListItem
             label="My Orders"
@@ -249,7 +297,7 @@ export function SettingsScreen({ onBack, themeMode, onToggleTheme, profilePhotoS
 
         {/* ── General Settings ───────────────────────────────── */}
         <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="General settings" />
+          <SectionHeader title="General settings" inset />
           <ListGroup>
           <ListItem
             label="Support & Feedback"

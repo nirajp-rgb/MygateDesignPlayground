@@ -25,21 +25,21 @@ function getTagToneMap() {
       onSolid: colors.contentOnDark
     },
     Positive: {
-      solidBg: colors.contentPositive,
+      solidBg: colors.contentPositiveBold,
       subtleBg: colors.surfacePositiveSubtle,
       border: colors.borderPositive,
       text: colors.contentPositive,
       onSolid: colors.contentOnDark
     },
     Warning: {
-      solidBg: colors.contentWarning,
+      solidBg: colors.surfaceWarningBold,
       subtleBg: colors.surfaceWarningSubtle,
       border: colors.borderWarning,
       text: colors.contentWarning,
       onSolid: colors.contentOnDark
     },
     Negative: {
-      solidBg: colors.contentNegative,
+      solidBg: colors.contentNegativeBold,
       subtleBg: colors.surfaceNegativeSubtle,
       border: colors.borderNegative,
       text: colors.contentNegative,

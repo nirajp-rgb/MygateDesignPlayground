@@ -22,6 +22,13 @@ export type BannerProps = {
 
 const toneColor: Record<BannerTone, string> = {
   neutral: colors.contentSecondary,
+  info: colors.surfaceInfoSubtle,
+  positive: colors.surfacePositiveSubtle,
+  warning: colors.surfaceWarningSubtle,
+  negative: colors.surfaceNegativeSubtle,
+};
+const toneIconColor: Record<BannerTone, string> = {
+  neutral: colors.contentSecondary,
   info: colors.contentInfo,
   positive: colors.contentPositive,
   warning: colors.contentWarning,
@@ -31,7 +38,7 @@ const toneColor: Record<BannerTone, string> = {
 export function Banner({ icon: Icon, iconColor, title, description, tone = 'neutral', actionLabel, onActionPress, onPress, elevated = false }: BannerProps) {
   const content = (
     <>
-      {Icon ? <IconTile icon={Icon} iconColor={iconColor ?? toneColor[tone]} backgroundColor={colors.surfaceSecondary} iconSize={iconSize.lg} tileSize={40} /> : null}
+      {Icon ? <IconTile icon={Icon} iconColor={iconColor ?? toneIconColor[tone]} backgroundColor={tone === 'neutral' ? colors.surfaceSecondary : toneColor[tone]} iconSize={iconSize.lg} tileSize={40} /> : null}
       <View style={{ flex: 1, gap: spacing.xs }}>
         <Text style={[typography.bodyDefaultBold, { color: colors.contentPrimary }]}>{title}</Text>
         {description ? <Text style={[typography.bodyDefault, { color: colors.contentSecondary }]}>{description}</Text> : null}
@@ -40,7 +47,7 @@ export function Banner({ icon: Icon, iconColor, title, description, tone = 'neut
     </>
   );
   return (
-    <SurfaceCard elevated={elevated} borderWidth={0}>
+    <SurfaceCard elevated={elevated} >
       {onPress ? <Pressable accessibilityRole="button" onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>{content}</Pressable> : <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>{content}</View>}
     </SurfaceCard>
   );

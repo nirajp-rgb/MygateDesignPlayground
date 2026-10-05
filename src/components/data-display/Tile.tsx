@@ -10,7 +10,7 @@ import type { TagKind, TagVariant } from './Tag';
 
 export type TileArtworkType = 'icon' | 'image' | 'none';
 export type TileSize = 'SM' | 'MD';
-export type TileVariant = 'standard' | 'card';
+export type TileVariant = 'standard' | 'card' | 'horizontal';
 
 type IconComponent = ComponentType<{
   size?: number;
@@ -69,6 +69,7 @@ export function Tile({
 }: TileProps) {
   const scale = sizeScale[size];
   const isCard = variant === 'card';
+  const isHorizontal = variant === 'horizontal';
 
   function renderArtworkContent() {
     if (artworkType === 'icon' && Icon) {
@@ -116,17 +117,29 @@ export function Tile({
               borderRadius: radius.xl,
             }
           : null),
-        alignItems: contentAlign === 'center' ? 'center' : 'flex-start',
+        ...(isHorizontal
+          ? {
+              minHeight: 72,
+              flexDirection: 'row' as const,
+              alignItems: 'center' as const,
+              justifyContent: 'space-between' as const,
+              backgroundColor: colors.surfacePrimary,
+              paddingHorizontal: spacing.lg,
+              paddingVertical: spacing.sm,
+              borderRadius: radius.xl,
+            }
+          : null),
+        alignItems: isHorizontal ? 'center' : contentAlign === 'center' ? 'center' : 'flex-start',
         gap: spacing.xs,
-        padding: isCard ? spacing.lg : spacing.xs,
-        borderRadius: isCard ? radius.xl : radius.md,
+        padding: isCard ? spacing.lg : isHorizontal ? undefined : spacing.xs,
+        borderRadius: isCard || isHorizontal ? radius.xl : radius.md,
         borderWidth: selected ? 1 : 0,
         borderColor: selected ? colors.borderAction : 'transparent',
         opacity: disabled ? 0.5 : pressed && onPress ? 0.75 : 1,
       })}
     >
-      {/* Card tiles keep artwork within the shared surface; standard tiles use an artwork box. */}
-      {isCard ? renderArtworkContent() : (
+      {/* Horizontal tiles place copy before artwork; card tiles stack artwork above copy. */}
+      {isHorizontal ? null : isCard ? renderArtworkContent() : (
         <View
           style={{
             width: scale.box,
@@ -159,7 +172,7 @@ export function Tile({
       )}
 
       {/* Label + optional sublabel — alignSelf stretch so text wraps within tile width */}
-      <View style={{ alignSelf: 'stretch', alignItems: contentAlign === 'center' ? 'center' : 'flex-start', gap: 2 }}>
+      <View style={{ flex: isHorizontal ? 1 : undefined, alignSelf: 'stretch', alignItems: isHorizontal ? 'flex-start' : contentAlign === 'center' ? 'center' : 'flex-start', justifyContent: 'center', gap: 2 }}>
         <Text
           numberOfLines={2}
           style={[typography.bodySmallBold, { color: colors.contentPrimary, textAlign: contentAlign }]}
@@ -172,6 +185,7 @@ export function Tile({
           </Text>
         ) : null}
       </View>
+      {isHorizontal ? renderArtworkContent() : null}
       {trailingContent}
     </Pressable>
   );

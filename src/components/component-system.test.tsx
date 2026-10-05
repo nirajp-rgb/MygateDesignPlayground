@@ -1,18 +1,22 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useState } from 'react';
+import { AccessibilityInfo } from 'react-native';
 import { Bell, House, User } from 'phosphor-react-native';
 import {
   ActionFooter,
   Banner,
   ChipGroup,
+  IconTile,
   ListGroup,
   ListItem,
   ModalSheet,
   ProgressSteps,
   SearchField,
   TextField,
+  Tile,
   TileGroup,
 } from './index';
+import { colors, dimensionTokens, spacing, typography } from '../tokens';
 
 describe('component system interactions', () => {
   it('keeps TextField controlled and parses display input', () => {
@@ -40,6 +44,41 @@ describe('component system interactions', () => {
     fireEvent.press(view.getByText('Settings'));
     expect(onSearch).toHaveBeenCalledTimes(1);
     expect(onRow).toHaveBeenCalledTimes(1);
+  });
+
+  it('supports a bold ListItem title variant', () => {
+    const view = render(<ListItem label="Bold title" titleWeight="bold" />);
+    expect(view.getByText('Bold title').props.style).toContainEqual(typography.bodyDefaultBold);
+  });
+
+  it('supports the large ListItem spacing variant', () => {
+    const view = render(<ListItem label="Large row" size="Large" />);
+    expect(JSON.stringify(view.toJSON())).toContain(`"paddingVertical":${spacing.xl}`);
+  });
+
+  it('maps IconTile size and tone variants to semantic tokens', () => {
+    const view = render(<IconTile icon={Bell} size="LG" tone="Negative" />);
+    const tile = view.toJSON();
+    expect(tile).not.toBeNull();
+    if (!tile || Array.isArray(tile)) return;
+    expect(tile.props.style).toEqual(expect.objectContaining({
+      width: dimensionTokens['Dimension/space/48'],
+      height: dimensionTokens['Dimension/space/48'],
+      backgroundColor: colors.surfaceNegativeSubtle,
+    }));
+  });
+
+  it('allows ListItem callers to compose both slots', () => {
+    const view = render(
+      <ListItem
+        label="Notification diagnostics"
+        surface="transparent"
+        leftSlot={<ListItem label="Nested content" controlElement={null} />}
+        rightSlot={<ListItem label="Trailing content" controlElement={null} />}
+      />,
+    );
+    expect(view.getByText('Nested content')).toBeTruthy();
+    expect(view.getByText('Trailing content')).toBeTruthy();
   });
 
   it('clears search and exposes TextField error and disabled states', () => {
@@ -71,6 +110,14 @@ describe('component system interactions', () => {
     expect(view.getAllByRole('button')[0].props.accessibilityState.selected).toBe(true);
   });
 
+  it('keeps horizontal tiles interactive', () => {
+    const onPress = jest.fn();
+    const view = render(<Tile label="Family" sublabel="2 members" icon={User} artworkType="icon" variant="horizontal" onPress={onPress} />);
+    fireEvent.press(view.getByText('Family'));
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(view.getByText('2 members')).toBeTruthy();
+  });
+
   it('owns list dividers and footer action behavior', () => {
     const primary = jest.fn();
     const disabled = jest.fn();
@@ -86,7 +133,8 @@ describe('component system interactions', () => {
     expect(view.getAllByRole('button').some((button) => button.props.accessibilityState?.disabled)).toBe(true);
   });
 
-  it('reports progress and handles banner and modal dismissal', () => {
+  it('reports progress and handles banner and modal dismissal', async () => {
+    const reduceMotion = jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(true);
     const onBanner = jest.fn();
     const onDismiss = jest.fn();
     const view = render(
@@ -98,9 +146,12 @@ describe('component system interactions', () => {
     );
     expect(view.getByLabelText('Progress').props.accessibilityValue).toEqual({ min: 1, max: 4, now: 2 });
     expect(view.getByText('Photos')).toBeTruthy();
+    await waitFor(() => expect(reduceMotion).toHaveBeenCalled());
     fireEvent.press(view.getByText('Update'));
     fireEvent.press(view.getByLabelText('Dismiss'));
     expect(onBanner).toHaveBeenCalledTimes(1);
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    reduceMotion.mockRestore();
   });
+
 });

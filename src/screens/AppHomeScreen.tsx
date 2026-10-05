@@ -51,7 +51,7 @@ import visitorYamini from '../assets/VisitorProfilePhotos/yamini.png';
 import marketplaceCar from '../assets/MarketplaceITems/4E12EFC8-BBDE-481C-8A9D-756F68E647C8.png';
 import marketplaceFurniture from '../assets/MarketplaceITems/6B64D0E5-2B41-45D6-8BB5-4B523E62CC3F.png';
 import marketplaceKitchen from '../assets/MarketplaceITems/D532470A-D6BC-4023-BA67-2E4A7F5ED952.png';
-import { CreatePostCard, FeedCard, FeedEventActions } from '../patterns/feed';
+import { CreatePostCard, FeedActionsSheet, FeedCard, FeedEventActions } from '../patterns/feed';
 import { FlatSelectionSheet, HomeProfileButton, VisitorAvatarButton } from '../patterns/home';
 
 
@@ -546,6 +546,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   const [firstFoldHeight, setFirstFoldHeight] = useState(0);
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showFlatSwitcher, setShowFlatSwitcher] = useState(false);
+  const [activeFeedPostId, setActiveFeedPostId] = useState<string | null>(null);
   const [isInSecondFold, setIsInSecondFold] = useState(false);
   const [isChipGroupSticky, setIsChipGroupSticky] = useState(false);
   const [chipGroupOffset, setChipGroupOffset] = useState(0);
@@ -970,7 +971,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surfacePageStrong }}>
+    <View style={{ flex: 1, backgroundColor: colors.surfacePage }}>
 
       {/* Header */}
       <AppHeader
@@ -1057,7 +1058,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
             <Text style={typography.bodyLargeBold}>3 Updates</Text>
           </View>
 
-          <SurfaceCard elevated={false} borderWidth={0}  >
+          <SurfaceCard elevated={false}   >
             <SectionHeader
               title="Visitor Updates"
               actionLabel="View All"
@@ -1114,6 +1115,7 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
               footer={post.category === 'notice' ? 'none' : post.kind === 'listing' ? 'listing' : 'standard'}
               likeCount={post.likeCount}
               replyCount={post.replyCount}
+              onMorePress={() => setActiveFeedPostId(post.id)}
               customFooter={post.kind === 'event' ? <FeedEventActions attendeeCount={post.attendeeCount} viewCount={post.likeCount} /> : undefined}
             >
               {renderFeedContent(post)}
@@ -1176,6 +1178,8 @@ export function AppHomeScreen({ onNavigate, onOpenDailyHelpProfile, onOpenVisito
       </ModalSheet>
 
       <FlatSelectionSheet visible={showFlatSwitcher} flats={flatOptions} onDismiss={() => setShowFlatSwitcher(false)} />
+
+      <FeedActionsSheet visible={activeFeedPostId !== null} onDismiss={() => setActiveFeedPostId(null)} />
 
     </View>
   );

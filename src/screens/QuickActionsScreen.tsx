@@ -129,7 +129,7 @@ export function QuickActionsScreen({ onNavigate, onClose }: Props) {
             <SectionHeader
               title={section.title}
               rightSlot={
-                section.actionLabel ? <Button kind={section.actionLabel === 'Raise Alert' ? 'Tertiary' : 'Link'} size={section.actionLabel === 'Raise Alert' ? 'SM' : 'MD'} label={section.actionLabel} /> : null}
+                section.actionLabel ? <Button kind={section.actionLabel === 'Raise Alert' ? 'Critical' : 'Link'} size={section.actionLabel === 'Raise Alert' ? 'SM' : 'MD'} label={section.actionLabel} /> : null}
             />
 
             {/* Tiles Grid */}

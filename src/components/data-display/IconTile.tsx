@@ -1,20 +1,26 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { View } from 'react-native';
 import type { IconWeight } from 'phosphor-react-native';
-import { radius } from '../../tokens';
+import { colors, dimensionTokens, iconSize, radius } from '../../tokens';
 
-type TileIcon = ComponentType<{
+export type IconTileTone = 'Neutral' | 'Action' | 'Info' | 'Positive' | 'Warning' | 'Negative';
+export type IconTileSize = 'SM' | 'MD' | 'LG';
+
+export type IconTileIcon = ComponentType<{
   size?: number;
   color?: string;
   weight?: IconWeight;
 }>;
 
-type IconTileProps = {
-  icon: TileIcon;
-  iconColor: string;
+export type IconTileProps = {
+  icon?: IconTileIcon;
+  children?: ReactNode;
+  tone?: IconTileTone;
+  size?: IconTileSize;
+  iconColor?: string;
   backgroundColor?: string;
   backgroundAlpha?: number;
-  iconSize: number;
+  iconSize?: number;
   tileSize?: number;
   cornerRadius?: number;
 };
@@ -40,25 +46,48 @@ function hexToRgba(hex: string, alpha: number) {
 
 export function IconTile({
   icon: Icon,
+  children,
+  tone = 'Neutral',
+  size = 'MD',
   iconColor,
   backgroundColor,
-  backgroundAlpha = 0.12,
-  iconSize,
-  tileSize = 40,
-  cornerRadius = radius.lg
+  backgroundAlpha,
+  iconSize: iconSizeOverride,
+  tileSize: tileSizeOverride,
+  cornerRadius,
 }: IconTileProps) {
+  const toneMap: Record<IconTileTone, { icon: string; background: string }> = {
+    Neutral: { icon: colors.contentSecondary, background: colors.surfaceSecondary },
+    Action: { icon: colors.contentAction, background: colors.surfaceActionSecondarySubtle },
+    Info: { icon: colors.contentInfo, background: colors.surfaceInfoSubtle },
+    Positive: { icon: colors.contentPositive, background: colors.surfacePositiveSubtle },
+    Warning: { icon: colors.contentWarning, background: colors.surfaceWarningSubtle },
+    Negative: { icon: colors.contentNegative, background: colors.surfaceNegativeSubtle },
+  };
+  const sizeMap: Record<IconTileSize, { tile: number; icon: number; radius: number }> = {
+    SM: { tile: dimensionTokens['Dimension/space/32'], icon: iconSize.sm, radius: radius.md },
+    MD: { tile: dimensionTokens['Dimension/space/40'], icon: iconSize.md, radius: radius.lg },
+    LG: { tile: dimensionTokens['Dimension/space/48'], icon: iconSize.lg, radius: radius.xl },
+  };
+  const palette = toneMap[tone];
+  const scale = sizeMap[size];
+  const resolvedIconColor = iconColor ?? palette.icon;
+  const resolvedBackgroundColor =
+    backgroundColor ??
+    (backgroundAlpha === undefined ? palette.background : hexToRgba(resolvedIconColor, backgroundAlpha));
+
   return (
     <View
       style={{
-        width: tileSize,
-        height: tileSize,
-        borderRadius: cornerRadius,
-        backgroundColor: backgroundColor ?? hexToRgba(iconColor, backgroundAlpha),
+        width: tileSizeOverride ?? scale.tile,
+        height: tileSizeOverride ?? scale.tile,
+        borderRadius: cornerRadius ?? scale.radius,
+        backgroundColor: resolvedBackgroundColor,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
-      <Icon size={iconSize} color={iconColor} weight="regular" />
+      {Icon ? <Icon size={iconSizeOverride ?? scale.icon} color={resolvedIconColor} weight="regular" /> : children}
     </View>
   );
 }

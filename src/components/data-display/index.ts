@@ -1,8 +1,9 @@
 export { Avatar } from './Avatar';
 export type { AvatarProps, AvatarShape, AvatarSize, AvatarStatus, AvatarType } from './Avatar';
 export { IconTile } from './IconTile';
+export type { IconTileIcon, IconTileProps, IconTileSize, IconTileTone } from './IconTile';
 export { ListItem } from './ListItem';
-export type { ListItemArtwork, ListItemLayout, ListItemProps, ListItemSize } from './ListItem';
+export type { ListItemArtwork, ListItemLayout, ListItemProps, ListItemSize, ListItemTitleWeight } from './ListItem';
 export { NumberBadge } from './NumberBadge';
 export { Tag } from './Tag';
 export { Tile } from './Tile';

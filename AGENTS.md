@@ -12,5 +12,7 @@ These rules are mandatory for every change to screens, components, patterns, and
 8. `style` may place a component in its parent layout. It must not redefine the component's color, typography, shape, or state appearance.
 9. Preserve existing route keys, visible copy, callbacks, and interaction behavior unless the task explicitly changes product behavior.
 10. A UI task is complete only when `npm run validate` passes and the relevant rows in `docs/SMOKE_TEST_MATRIX.md` have been checked.
+11. Every new page or overlay must follow `docs/PAGE_PRESENTATION_AND_MOTION_GUIDELINES.md`. Choose an explicit presentation model—hierarchical route, modal, sheet, or inline disclosure—and preserve platform-standard Back, Close, and Cancel semantics.
+12. Every custom animation or transition must follow the project motion principles, remain interruptible, communicate a clear state or spatial relationship, and provide a Reduce Motion alternative. Motion must never be the only signal of state.
 
-Read `docs/COMPONENT_CONTRIBUTION_GUIDE.md` for classification and review criteria.
+Read `docs/COMPONENT_CONTRIBUTION_GUIDE.md` for classification and review criteria. Read `docs/PAGE_PRESENTATION_AND_MOTION_GUIDELINES.md` before adding or changing a page transition, modal, sheet, disclosure, or animation.

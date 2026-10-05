@@ -1,6 +1,9 @@
 export { HomeScreen } from './HomeScreen';
 export { TemplateScreen } from './TemplateScreen';
 export { SettingsScreen } from './SettingsScreen';
+export { NotificationSettingsScreen } from './NotificationSettingsScreen';
+export { ApprovalNotificationScreen } from './ApprovalNotificationScreen';
+export { EntryExitNotificationsScreen } from './EntryExitNotificationsScreen';
 export { DailyHelpProfileScreen } from './DailyHelpProfileScreen';
 export { AppHomeScreen } from './AppHomeScreen';
 export { MarketplaceScreen } from './MarketplaceScreen';

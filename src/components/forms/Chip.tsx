@@ -72,10 +72,10 @@ export function Chip({
 
   const backgroundColor = isDisabled
     ? colors.surfaceDisabled
-    : isPressed
+    : isSelected || isPressed
       ? colors.surfaceActionSecondarySubtle
       : toneStyles.bg;
-      const borderColor = isDisabled
+  const borderColor = isDisabled
       ? colors.borderSubtle
       : isSelected
         ? colors.borderAction
